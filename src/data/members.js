@@ -7,11 +7,10 @@ export const members = [
     batch: '2024-28',
     shortDescription: "Full-stack developer building scalable web apps and strengthening DSA through consistent problem solving",
     linkedIn: "https://www.linkedin.com/in/aditya-singh-82a341320/",
-    bg: '/profileCards/AdityaSinghProfileCard.png',
+    bg: '/images/cardBg.png',
     profileImg: '/images/members/aditya.jpg'
   },
   {
-    id: 5,
     name: 'Aditi Pandey',
     batch: '2024-28',
     shortDescription: "Focused on learning Data Structures and improving problem-solving skills",
