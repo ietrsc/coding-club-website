@@ -8,6 +8,11 @@ function DSA() {
     (resource) => resource.featured
   );
   const [filter, setFilter] = useState('All');
+  const filteredFeaturedResources = resources.filter(
+    (resource) => (resource.category && resource.featured)
+  );
+  console.log(filteredFeaturedResources);
+
   const categories = [
     "All",
     "Sheets",

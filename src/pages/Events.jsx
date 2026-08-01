@@ -54,8 +54,8 @@ function Events() {
                   <div
                     className="group p-6 ml-6 rounded-xl z-10 w-full max-w-sm h-auto"
                   >
-                    <div className='h-38 w-48 border-4  border-primary rounded-2xl overflow-hidden'>
-                      <img src={event.thumbnail} alt="event image" className='h-47 w-50 object-cover group-hover:scale-3d transition-transform duration-300 rounded-xl scale-105 group-hover:scale-115 ' />
+                    <div className='h-40 w-48 border-4  border-primary rounded-2xl overflow-hidden'>
+                      <img src={event.thumbnail} alt="event image" className='h-40 w-50 object-cover group-hover:scale-3d transition-transform duration-300 rounded-xl group-hover:scale-115 ' />
                     </div>
 
 
@@ -79,22 +79,30 @@ function Events() {
                         </span>
                       </div>
                       <div className={`${event.status === "expired" ? "" : "hidden"}`}>
-                        <div className=''>
-                          <img
-                            src="/icons/expired.png"
-                            className='h-7 w-8 ml-2'
-                          ></img>
-                        </div>
+                        <span className="text-xs px-2 py-0.75 rounded-full bg-gray-500/45 text-gray-400">
+                          <span className='ml-0.5'>
+                            {event.status}
+                          </span>
+                        </span>
+                      </div>
+                      <div className={`${event.status === "upcoming" ? "" : "hidden"}`}>
+                        <span className="text-xs px-3 py-0.75 rounded-full bg-yellow-500/20 text-yellow-400">
+                          <span className="relative inline-flex size-3">
+                            <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-yellow-400 opacity-75"></span>
+                            <span className="relative inline-flex size-2 rounded-full bg-yellow-500"></span>
+                          </span>
+                          <span className='ml-0.5'>
+                            {event.status}
+                          </span>
+                        </span>
                       </div>
                     </div>
 
                     <div className='flex flex-col mt-2 justify-center items-center gap-2'>
-                      <button onClick={() => navigate(`/events/${event.id}`)} className=" text-white transition-all duration-50 sm:duration-100 cursor-pointer z-20 border border-primary bg-black/35 hover:bg-primary active:bg-primary rounded-2xl w-full h-8" >
+                      <button onClick={() => navigate(`/events/${event.slug}`)} className=" text-white transition-all duration-50 sm:duration-100 cursor-pointer z-20 border border-primary bg-black/35 hover:bg-primary active:bg-primary rounded-2xl w-full h-8" >
                         Details
                       </button>
-                      <button onClick={() => navigate(`/eventresults/${event.id}`)} className="w-full h-8 border border-primary bg-black/35 hover:bg-primary active:bg-primary rounded-2xl transition-all duration-50 sm:duration-100 cursor-pointer  z-20 " >
-                        Results
-                      </button>
+
 
                     </div>
                   </div>

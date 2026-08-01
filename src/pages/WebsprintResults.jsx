@@ -3,9 +3,8 @@ import { events } from "../data/event";
 import GridAnimation from "../components/GridAnimation";
 import { Download } from "lucide-react";
 
-function EventResults() {
-  const { id } = useParams();
-  const event = events.find((e) => e.id === Number(id));
+function WebsprintResults() {
+  const event = events.find((e) => e.slug === "websprint-2025");
   if (!event) {
     return <div className="pt-24 text-center">Event not found</div>;
   }
@@ -198,11 +197,16 @@ transition-all duration-300 ease-in-out hover:shadow-[0_0_30px_rgba(32,178,166,0
                 </p>
               </div>
 
+
               <div className="absolute bottom-0 left-1/2 h-3 w-28 -translate-x-1/2 rounded-full bg-cyan-400/90 blur-xl"></div>
             </div>
 
 
           </div>
+           <div className="z-10 pt-10 text-center">
+            <a href={event.gallery} target="_blank" className="text-xl transition-all duration-300 ease-in-out group-hover:shadow-[0_0_30px_rgba(32,178,166,0.2)] group-hover:bg-primary/10 underline text-primary">View Event Gallery →</a>
+          </div>
+
         </section>
       </section>
 
@@ -210,4 +214,4 @@ transition-all duration-300 ease-in-out hover:shadow-[0_0_30px_rgba(32,178,166,0
   )
 }
 
-export default EventResults;
+export default WebsprintResults;

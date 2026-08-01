@@ -51,7 +51,7 @@ function Home() {
       ></div>
 
       {/*overlay layer*/}
-      <div className='fixed inset-0 bg-linear-to-b from-black/75 via-black/80 to-black/75'></div>
+      <div className='fixed inset-0 bg-linear-to-r from-black/55 via-black/80 to-primary/8'></div>
 
 
 

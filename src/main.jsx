@@ -9,7 +9,7 @@ import Members from './pages/Members.jsx'
 import Contact from './pages/Contact.jsx'
 import EventDetails from "./pages/EventDetails";
 import Resources from './pages/Resources.jsx'
-import EventsResults from './pages/EventResults.jsx'
+import WebsprintResults from './pages/WebsprintResults.jsx'
 import DSA from './pages/DSA.jsx'
 import Development from './pages/Development.jsx'
 import Academics from './pages/Academics.jsx'
@@ -37,12 +37,12 @@ const router = createBrowserRouter([
 
       },
       {
-        path: "/events/:id",
+        path: "/events/:slug",
         element: <EventDetails />
       },
       {
-        path: "/eventresults/:id",
-        element: <EventsResults />
+        path: "/results/websprint-2025",
+        element: <WebsprintResults />
       },
       {
         path: "/resources",
