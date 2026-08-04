@@ -45,7 +45,7 @@ title: "Love Babbar DSA Sheet",
 category: "Sheet",
 description:
 "450+ coding questions frequently asked in product-based company interviews.",
-link: "#",
+link: "https://www.geeksforgeeks.org/dsa/dsa-sheet-by-love-babbar/",
 featured: false,
 },
 
@@ -55,7 +55,7 @@ title: "DSA Roadmap",
 category: "Roadmap",
 description:
 "Step-by-step learning path from DSA fundamentals to advanced topics.",
-link: "#",
+link: "https://www.geeksforgeeks.org/dsa/complete-roadmap-to-learn-dsa-from-scratch/",
 featured: false,
 },
 
