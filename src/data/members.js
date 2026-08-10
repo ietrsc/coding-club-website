@@ -14,7 +14,7 @@ export const members = [
     name: 'Aditi Pandey',
     batch: '2024-28',
     shortDescription: "Focused on learning Data Structures and improving problem-solving skills",
-    linkedIn: "#",
+    linkedIn: "https://www.linkedin.com/in/aditi-pandey-689800274",
     bg: '/images/cardBg.png',
     profileImg: '/images/members/aditi.jpg'
   },
@@ -33,7 +33,7 @@ export const members = [
     name: 'Shagun',
     batch: '2024-28',
     shortDescription: "Exploring full-stack, embedded systems, and Web3 through projects and open-source",
-    linkedIn: "#",
+    linkedIn: "https://www.linkedin.com/in/shagunn06",
     bg: '/images/cardBg.png',
     profileImg: '/images/members/shagun.jpg'
   },
@@ -43,8 +43,8 @@ export const members = [
     batch: '2024-28',
     shortDescription: "Focused on building clean, responsive, and user-friendly web interfaces",
     linkedIn: "https://www.linkedin.com/in/raj-shekhar-patel-332782329/",
-     bg: '/images/cardBg.png',
-     profileImg: '/images/members/raj.jpg'
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/raj.jpg'
   },
 
   {
@@ -52,8 +52,8 @@ export const members = [
     batch: '2024-28',
     shortDescription: "Data Science and ML undergrad",
     linkedIn: "www.linkedin.com/in/priyanshujaiswal06",
-     bg: '/images/cardBg.png',
-     profileImg: '/images/members/priyanshu.jpg'
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/priyanshu.jpg'
   },
   {
     name: "Sachin Pandey",
@@ -85,16 +85,16 @@ export const members = [
     shortDescription: "Passionate about Full-Stack and Generative AI, building scalable applications for real-world problems.",
 
     linkedIn: "https://www.linkedin.com/in/aditya-mishra-6b587322b",
-     bg: '/images/cardBg.png',
-     profileImg: '/images/members/adityaMishra.jpg'
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/adityaMishra.jpg'
   },
   {
     name: "Sarvesh Pandey",
     shortDescription: "Cse Undergrad IET Rmlau 2023-27",
     linkedIn: "https://www.linkedin.com/in/sarveshpandey01/",
     batch: '2022-26',
-     bg: '/images/cardBg.png',
-     profileImg: '/images/members/sarvesh.jpg'
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/sarvesh.jpg'
   },
   {
     "name": "Anurag Pasi",
@@ -102,24 +102,24 @@ export const members = [
     "shortDescription": "Software engineer building AI-powered ERP, ML solutions, and business automation with Python and React.",
 
     "linkedin": "https://www.linkedin.com/in/anurag-pasi-80a138259/",
-     bg: '/images/cardBg.png',
-     profileImg: '/images/members/anurag.jpg'
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/anurag.jpg'
   },
   {
     name: "Rajat Pandey",
     batch: '2022-26',
     shortDescription: "GATE 2026, Full stack developer, Constructing ERP models .",
     linkedIn: "https://www.linkedin.com/in/rajat-pandey-661a29248",
-     bg: '/images/cardBg.png',
-     profileImg: '/images/members/rajat.jpg'
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/rajat.jpg'
   },
   {
     name: "Shivam Verma",
     batch: '2022-26',
     shortDescription: "Passionate about MERN Stack and React Native, building innovative solutions for real-world challenges.",
     linkedIn: - "https://www.linkedin.com/in/shivam-verma-91327a293",
-     bg: '/images/cardBg.png',
-     profileImg: '/images/members/shivam.jpg'
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/shivam.jpg'
   },
 
 ]
