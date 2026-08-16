@@ -44,22 +44,22 @@ const router = createBrowserRouter([
         path: "/results/websprint-2025",
         element: <WebsprintResults />
       },
-      {
-        path: "/resources",
-        element: <Resources />,
-      },
-      {
-            path: "/dsa",
-            element: <DSA />
-          },
-          {
-            path: "/development",
-            element: <Development />
-          },
-          {
-            path: "/academics",
-            element: <Academics />
-          }
+      // {
+      //   path: "/resources",
+      //   element: <Resources />,
+      // },
+      // {
+      //       path: "/dsa",
+      //       element: <DSA />
+      //     },
+      //     {
+      //       path: "/development",
+      //       element: <Development />
+      //     },
+      //     {
+      //       path: "/academics",
+      //       element: <Academics />
+      //     }
     ]
   },
 ]);

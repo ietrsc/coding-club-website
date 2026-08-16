@@ -14,6 +14,7 @@ import {
 import { UsersRound, Sparkles, Plus } from "lucide-react";
 import { TypeAnimation } from 'react-type-animation';
 import { blockquote, code } from 'framer-motion/client';
+import Announcement from '../components/Announcement';
 
 
 function Home() {
@@ -83,7 +84,7 @@ function Home() {
 
       {/*main content*/}
       <section className='relative min-h-screen overflow-hidden'>
-        <div className='relative z-10 flex flex-col justify-center items-center min-h-screen text-center px-4 sm:px-6 gap-4 animate-[fadeIn_1s_ease-in-out]'>
+        <div className='relative z-10 flex flex-col justify-center -top-10 md:top-0 items-center min-h-screen text-center px-4 sm:px-6 gap-4 animate-[fadeIn_1s_ease-in-out]'>
 
           <h1
             className='text-4xl  md:text-6xl font-bold
@@ -122,19 +123,22 @@ function Home() {
         </div>
         <button
           onClick={() =>
-            document.getElementById("about-community")?.scrollIntoView({
+            document.getElementById("announcement")?.scrollIntoView({
               behavior: "smooth",
             })
           }
-          className="hidden md:flex absolute bottom-12 left-1/2 z-20 -translate-x-1/2 flex-col items-center gap-1 text-muted-foreground cursor-pointer hover:text-white transition-colors group"
+          className="flex absolute bottom-35 md:bottom-12 left-1/2 z-20 -translate-x-1/2 flex-col items-center gap-1 text-muted-foreground cursor-pointer hover:text-white transition-colors group"
         >
           <span className="text-sm transition-all duration-300 ease-in-out group-hover:shadow-[0_0_30px_rgba(32,178,166,0.2)] group-hover:bg-primary/10">Scroll to Explore</span>
           <ChevronDown className="h-8 w-8 text-primary animate-bounce drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
         </button>
       </section>
+      <section id = "announcement" >
+        <Announcement/>
+      </section>
 
       {/*About community*/}
-      <section id="about-community" className='relative min-h-screen overflow-hidden'>
+      <section id="about-community" className='relative min-h-screen overflow-hidden mt-10'>
         <div className="animate-[fadeIn_1s_ease-in-out] container mx-auto px-6 text-center z-10 md:py-23">
 
           <h2 className="animate-[fadeIn_1s_ease-in-out] text-5xl font-bold mb-4">

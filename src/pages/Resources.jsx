@@ -84,7 +84,9 @@ transition-all duration-300 ease-in-out hover:shadow-[0_0_30px_rgba(32,178,166,0
           </div>
           </a>
 
-          <a className='cursor-pointer group'>
+          <a className='cursor-pointer group' onClick={
+            () => navigate('/academics')
+          }>
           <div className="z-10 animate-[fadeIn_0.8s_ease-in-out] p-6 rounded-xl bg-primary/10 backdrop-blur-xs border border-white/10 hover:-translate-y-3 hover:scale-[1.02]
 transition-all duration-300 ease-in-out hover:shadow-[0_0_30px_rgba(32,178,166,0.2)] flex flex-col gap-2">
             <GraduationCap className="w-12 h-12 text-primary" />
