@@ -51,7 +51,7 @@ export const members = [
     name: "Priyanshu Jaiswal",
     batch: '2024-28',
     shortDescription: "Data Science and ML undergrad",
-    linkedIn: "www.linkedin.com/in/priyanshujaiswal06",
+    linkedIn: "https://www.linkedin.com/in/priyanshujaiswal06",
     bg: '/images/cardBg.png',
     profileImg: '/images/members/priyanshu.jpg'
   },
@@ -59,7 +59,7 @@ export const members = [
     name: "Sachin Pandey",
     batch: '2023 - 27',
     shortDescription: "IT Undergrad Student, Data analyst, transforming numbers into strategic decisions.",
-    linkedIn: - "https://www.linkedin.com/in/shivam-verma-91327a293",
+    linkedIn: "https://www.linkedin.com/in/sachin-pandey-954467289",
     bg: '/images/cardBg.png',
     profileImg: '/images/members/sachin.jpg'
   },
@@ -79,6 +79,25 @@ export const members = [
     bg: '/images/cardBg.png',
     profileImg: '/images/members/harikesh.jpg'
   },
+
+  {
+    name: "Sarvesh Pandey",
+    shortDescription: "Cse Undergrad IET Rmlau 2023-27",
+    linkedIn: "https://www.linkedin.com/in/sarveshpandey01/",
+    batch: '2023-27',
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/sarvesh.jpg'
+  },
+
+
+  {
+    name: "Shivam Verma",
+    batch: '2023-27',
+    shortDescription: "Passionate about MERN Stack and React Native, building innovative solutions for real-world challenges.",
+    linkedIn: "https://www.linkedin.com/in/shivam-verma-91327a293",
+    bg: '/images/cardBg.png',
+    profileImg: '/images/members/shivam.jpg'
+  },
   {
     name: "Aditya Mishra",
     batch: '2022-26',
@@ -89,19 +108,11 @@ export const members = [
     profileImg: '/images/members/adityaMishra.jpg'
   },
   {
-    name: "Sarvesh Pandey",
-    shortDescription: "Cse Undergrad IET Rmlau 2023-27",
-    linkedIn: "https://www.linkedin.com/in/sarveshpandey01/",
-    batch: '2022-26',
-    bg: '/images/cardBg.png',
-    profileImg: '/images/members/sarvesh.jpg'
-  },
-  {
     "name": "Anurag Pasi",
     batch: '2022-26',
     "shortDescription": "Software engineer building AI-powered ERP, ML solutions, and business automation with Python and React.",
 
-    "linkedin": "https://www.linkedin.com/in/anurag-pasi-80a138259/",
+    linkedIn: "https://www.linkedin.com/in/anurag-pasi-80a138259/",
     bg: '/images/cardBg.png',
     profileImg: '/images/members/anurag.jpg'
   },
@@ -112,14 +123,6 @@ export const members = [
     linkedIn: "https://www.linkedin.com/in/rajat-pandey-661a29248",
     bg: '/images/cardBg.png',
     profileImg: '/images/members/rajat.jpg'
-  },
-  {
-    name: "Shivam Verma",
-    batch: '2022-26',
-    shortDescription: "Passionate about MERN Stack and React Native, building innovative solutions for real-world challenges.",
-    linkedIn: - "https://www.linkedin.com/in/shivam-verma-91327a293",
-    bg: '/images/cardBg.png',
-    profileImg: '/images/members/shivam.jpg'
   },
 
 ]

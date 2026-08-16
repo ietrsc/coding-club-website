@@ -8,7 +8,7 @@ function Footer() {
         {/* Icons */}
         <div className="flex items-center gap-6 ">
           <a
-            href="https://github.com/adityasingh-rana/coding-club-website"
+            href="https://github.com/ietrsc/coding-club-website"
             target="_blank"
             rel="noopener noreferrer"
             className="transition duration-300 hover:text-primary"
@@ -26,7 +26,7 @@ function Footer() {
           </a>
 
           <a
-            href="mailto:adityasinghk099@gmail.com"
+            href="mailto:contact.adityasingh.tech@gmail.com"
             className="transition duration-300 hover:text-primary"
           >
             <i className="ri-mail-line text-xl"></i>

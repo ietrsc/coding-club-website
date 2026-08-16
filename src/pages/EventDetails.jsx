@@ -77,7 +77,7 @@ function EventDetails() {
               <li><strong>Phone:</strong> {event.phone} </li>
               <li><strong>Email:</strong> {event.email} </li>
             </ul>
-            <div>
+            <div className={`${event.status === "upcoming" ? "hidden" : "relative" }`}>
               <h2>Important Documents:</h2>
               <div className="flex gap-2">
                 <p className="text-muted-foreground"> Problem Statements:</p>
@@ -87,7 +87,7 @@ function EventDetails() {
               </div>
               <div className="flex gap-2">
                 <p className="text-muted-foreground"> RuleBook:</p>
-                <a href={event.rulebookLink} className="text-blue-400 hover:underline">
+              <a href={event.rulebookLink} className= "text-blue-400 hover:underline">
                   <Download size={20} className="hover:scale-115" />
                 </a>
               </div>
