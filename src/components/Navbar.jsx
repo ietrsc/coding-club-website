@@ -195,7 +195,7 @@ function Navbar() {
             DESKTOP SIH AUTH
         ========================================= */}
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className={`hidden md:flex items-center gap-3 ${location.pathname == "/sih" ? "" : "md:hidden"}`}>
           {isAuthenticated ? (
             <>
               <Link
