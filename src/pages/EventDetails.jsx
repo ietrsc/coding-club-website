@@ -125,7 +125,7 @@ function EventDetails() {
       </section>
       <div className="fixed bottom-15 right-15 z-50 hidden md:block">
         <a
-          href= {event.registrationLink}
+          onClick={()=>navigate('/sih')}
           target="_blank"
           rel="noopener noreferrer"
           className={`${event.status === 'live' ? '' : 'hidden'} z-15`}
