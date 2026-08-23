@@ -24,9 +24,13 @@ const userTeamId =
   user?.participantId?.teamId?._id ||
   user?.participantId?.teamId;
 
+// user.participantId.teamId is now populated with
+// { _id, teamName, leaderId } by getCurrentUser, so we
+// can tell if the logged-in participant leads their team
+// without a second network request.
 const teamLeaderId =
-  user?.team?.leaderId?._id ||
-  user?.team?.leaderId;
+  user?.participantId?.teamId?.leaderId?._id ||
+  user?.participantId?.teamId?.leaderId;
 
 const isTeamLeader =
   Boolean(userParticipantId) &&

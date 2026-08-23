@@ -19,15 +19,12 @@ function CreateTeam() {
   const {
     user,
     loading: authLoading,
+    fetchCurrentUser,
   } = useSihAuth();
 
   const [teamName, setTeamName] = useState("");
 
-  const [members, setMembers] = useState([
-    {
-      ...emptyPerson,
-    },
-  ]);
+  const [members, setMembers] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -328,23 +325,21 @@ function CreateTeam() {
         );
       }
 
-      setSuccess(
-        "Team created successfully!"
-      );
+      setSuccess("Team created successfully!");
 
-      const createdTeam =
-        data.data || data;
+const createdTeam = data.data || data;
 
-      setTimeout(() => {
-        if (createdTeam?._id) {
-          navigate(
-            `/sih/teams/${createdTeam._id}`
-          );
-        } else {
-          navigate("/sih/teams");
-        }
-      }, 1200);
+// Refresh the logged-in user's data
+// This updates user.participantId.teamId in SihAuthContext
+await fetchCurrentUser();
 
+setTimeout(() => {
+  if (createdTeam?._id) {
+    navigate(`/sih/teams/${createdTeam._id}`);
+  } else {
+    navigate("/sih/teams");
+  }
+}, 1200);
     } catch (err) {
       setError(
         err.message ||
@@ -601,6 +596,14 @@ function CreateTeam() {
 
             <div className="mt-6 space-y-6">
 
+              {members.length === 0 && (
+                <div className="rounded-2xl border border-dashed border-border bg-background/30 p-5 text-sm text-muted-foreground">
+                  No additional members yet — that's fine,
+                  you can create the team with just yourself
+                  and invite others later.
+                </div>
+              )}
+
               {members.map(
                 (member, index) => (
 
@@ -615,17 +618,19 @@ function CreateTeam() {
                         Member {index + 2}
                       </h3>
 
-                      {members.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeMember(index)
-                          }
-                          className="text-xs text-red-500 hover:text-red-400"
-                        >
-                          Remove
-                        </button>
-                      )}
+                      {/* No minimum members required —
+                          a team of just the leader is
+                          valid, so Remove is always
+                          available. */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeMember(index)
+                        }
+                        className="text-xs text-red-500 hover:text-red-400"
+                      >
+                        Remove
+                      </button>
 
                     </div>
 
@@ -668,7 +673,9 @@ function CreateTeam() {
             <p className="text-xs leading-5 text-muted-foreground">
               The logged-in participant will automatically
               become the team leader and the first team
-              member. Add up to 5 additional members here.
+              member. Adding more members is optional — you
+              can create a team with just yourself and add
+              up to 5 more (6 total) whenever you're ready.
             </p>
 
           </div>

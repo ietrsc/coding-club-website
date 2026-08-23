@@ -20,7 +20,7 @@ export function SihAuthProvider({ children }) {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:8000/api/auth/me",
+        `${import.meta.env.VITE_API_URL}/api/auth/me`,
         {
           credentials: "include",
         }
@@ -65,7 +65,7 @@ export function SihAuthProvider({ children }) {
   const logout = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8000/api/auth/logout",
+        `${import.meta.env.VITE_API_URL}/api/auth/logout`,
         {
           method: "POST",
           credentials: "include",

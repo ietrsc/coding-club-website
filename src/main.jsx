@@ -134,8 +134,12 @@ const router = createBrowserRouter([
         ),
       },
       {
-  path:"/sih/invitations",
-  element:<MyInvitations/>
+  path: "/sih/invitations",
+  element: (
+    <ProtectedSihRoute>
+      <MyInvitations />
+    </ProtectedSihRoute>
+  ),
 }
 
 

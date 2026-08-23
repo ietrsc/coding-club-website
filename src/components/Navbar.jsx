@@ -11,7 +11,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [invitationCount, setInvitationCount] = useState(0);
 
-  const { user, isAuthenticated, logout } = useSihAuth();
+  const { user, isAuthenticated, logout, loading:authLoading } = useSihAuth();
 
   // ==========================================
   // LOGOUT
@@ -48,27 +48,69 @@ function Navbar() {
     };
   }, []);
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated || !user?._id) {
+      setInvitationCount(0);
+      return;
+    }
+
+    let cancelled = false;
     const fetchInvitationCount = async () => {
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/api/invitations/my`,
           {
             credentials: "include",
-          },
+          }
         );
 
-        if (!response.ok) return;
+        if (!response.ok) {
+          if (!cancelled) {
+            setInvitationCount(0);
+          }
+          return;
+        }
 
         const data = await response.json();
 
-        setInvitationCount(data.data?.length || 0);
+        if (!cancelled) {
+          setInvitationCount(data.data?.length || 0);
+        }
       } catch (error) {
-        console.error("Failed to fetch invitation count:", error);
+        console.error(
+          "Failed to fetch invitation count:",
+          error
+        );
+
+        if (!cancelled) {
+          setInvitationCount(0);
+        }
       }
     };
 
     fetchInvitationCount();
-  }, []);
+
+    // Update count immediately when an invitation
+    // is accepted or rejected.
+    window.addEventListener(
+      "sih-invitations-changed",
+      fetchInvitationCount
+    );
+
+    return () => {
+      cancelled = true;
+
+      window.removeEventListener(
+        "sih-invitations-changed",
+        fetchInvitationCount
+      );
+    };
+  }, [
+    authLoading,
+    isAuthenticated,
+    user?._id,
+  ]);
 
   return (
     <header
@@ -153,8 +195,8 @@ function Navbar() {
             DESKTOP SIH AUTH
         ========================================= */}
 
-        {/* <div className="hidden md:flex items-center gap-3">
-          {isAuthenticated (
+        <div className="hidden md:flex items-center gap-3">
+          {isAuthenticated ? (
             <>
               <Link
                 to="/sih/invitations"
@@ -197,7 +239,7 @@ function Navbar() {
               </Link>
             </>
           )}
-        </div> */}
+        </div>
 
         {/* ========================================
             MOBILE MENU BUTTON

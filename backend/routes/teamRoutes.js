@@ -30,6 +30,7 @@ router.delete(
 router.delete(
   "/:teamId",
   authMiddleware,
+  teamLeaderMiddleware,
   deleteTeam
 );
 

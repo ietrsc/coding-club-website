@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
 
 function TeamDetails() {
   const { teamId } = useParams();
+  const navigate = useNavigate();
 
   const {
     user,
     isAuthenticated,
+    fetchCurrentUser,
     loading: authLoading,
   } = useSihAuth();
 
@@ -27,7 +29,11 @@ function TeamDetails() {
     useState("");
   const [requestMessage, setRequestMessage] =
     useState("");
-const totalMembers = (team?.members?.length || 0) + 1; // +1 for leader
+// team.members already includes the leader (see
+// team.controller.js createTeam), so no +1 is needed
+// here — adding one double-counted the leader and made
+// this badge unable to ever show "Eligible".
+const totalMembers = team?.members?.length || 0;
 
 const isEligible =
   team?.isEligible === true &&
@@ -268,6 +274,8 @@ const isEligible =
     }
 
     alert("Team deleted successfully");
+
+    await fetchCurrentUser()
 
     navigate("/sih/teams");
 

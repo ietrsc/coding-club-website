@@ -39,4 +39,28 @@ import authRoutes from "./routes/authRoutes.js";
 
 app.use("/api/auth", authRoutes);
 
+// ==========================================
+// GLOBAL ERROR HANDLER
+// ==========================================
+// Without this, every ApiError thrown inside an
+// asyncHandler falls through to Express's default
+// error page (HTML + stack trace) instead of JSON,
+// which breaks every `response.json()` call on the
+// frontend and leaks server file paths.
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+
+    if (process.env.NODE_ENV !== "production") {
+        console.error(err);
+    }
+
+    return res.status(statusCode).json({
+        success: false,
+        message,
+        errors: err.errors || [],
+        data: err.data || null,
+    });
+});
+
 export {app}

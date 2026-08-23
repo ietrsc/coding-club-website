@@ -31,6 +31,11 @@ const joinRequestSchema = new mongoose.Schema(
   }
 );
 
+// Only enforce uniqueness while a request is still
+// pending. Without partialFilterExpression, once a
+// request is rejected/accepted, MongoDB blocks any
+// future request between the same participant/team
+// with a duplicate-key error.
 joinRequestSchema.index(
   {
     participantId: 1,
@@ -39,6 +44,7 @@ joinRequestSchema.index(
   },
   {
     unique: true,
+    partialFilterExpression: { status: "pending" },
   }
 );
 

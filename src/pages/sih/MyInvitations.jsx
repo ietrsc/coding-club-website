@@ -89,6 +89,9 @@ if (!response.ok) {
             invitation._id !== invitationId
         )
       );
+      window.dispatchEvent(
+  new CustomEvent("sih-invitations-changed")
+);
 
       // Redirect to team page after success
       setTimeout(() => {
@@ -141,6 +144,9 @@ if (!response.ok) {
             invitation._id !== invitationId
         )
       );
+      window.dispatchEvent(
+  new CustomEvent("sih-invitations-changed")
+);
 
     } catch (error) {
       setError(

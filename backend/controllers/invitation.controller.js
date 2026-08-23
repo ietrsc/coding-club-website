@@ -25,16 +25,26 @@ const sendTeamInvitation = asyncHandler(async (req, res) => {
   }
 
   // Find team led by this participant
-  const team = await Team.findOne({
-    leaderId: leaderParticipant._id,
-  });
+  const team = await Team.findById(
+  leaderParticipant.teamId
+);
 
-  if (!team) {
-    throw new ApiError(
-      404,
-      "You are not a team leader"
-    );
-  }
+if (!team) {
+  throw new ApiError(
+    404,
+    "Team not found"
+  );
+}
+
+if (
+  team.leaderId.toString() !==
+  leaderParticipant._id.toString()
+) {
+  throw new ApiError(
+    403,
+    "Only the team leader can send invitations"
+  );
+}
 
   // Team capacity check
   if (team.members.length >= 6) {
@@ -118,24 +128,26 @@ const getAvailableParticipants = asyncHandler(async (req, res) => {
   }
 
   // Find the team led by this participant
-  const team = await Team.findOne({
-    leaderId: leaderParticipant._id,
-  });
+  const team = await Team.findById(
+  leaderParticipant.teamId
+);
 
-  if (!team) {
-    throw new ApiError(404, "Team not found");
-  }
+if (!team) {
+  throw new ApiError(
+    404,
+    "Team not found"
+  );
+}
 
-  // Verify that the logged-in participant is actually the leader
-  if (
-    team.leaderId.toString() !==
-    leaderParticipant._id.toString()
-  ) {
-    throw new ApiError(
-      403,
-      "Only the team leader can view available participants"
-    );
-  }
+if (
+  team.leaderId.toString() !==
+  leaderParticipant._id.toString()
+) {
+  throw new ApiError(
+    403,
+    "Only the team leader can view available participants"
+  );
+}
 
   // Find participants who don't belong to any team
   // and exclude the leader themselves
@@ -143,7 +155,7 @@ const getAvailableParticipants = asyncHandler(async (req, res) => {
     teamId: null,
     _id: { $ne: leaderParticipant._id },
   }).select(
-    "name email phone gender college branch year skills"
+    "name email phone gender department branch year skills"
   );
 
   return res.status(200).json(

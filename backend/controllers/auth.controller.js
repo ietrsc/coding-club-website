@@ -344,9 +344,13 @@ const getCurrentUser = asyncHandler(
       req.user.userId
     )
       .select("-password -__v")
-      .populate(
-        "participantId"
-      );
+      .populate({
+        path: "participantId",
+        populate: {
+          path: "teamId",
+          select: "teamName leaderId",
+        },
+      });
 
     if (!user) {
       throw new ApiError(

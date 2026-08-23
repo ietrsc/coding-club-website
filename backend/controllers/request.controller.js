@@ -680,10 +680,19 @@ if (existingRequest) {
   );
 }
 
+// NOTE: this function is not currently wired to any
+// route (dead code) — it previously created a "join"
+// requestType here even though this is a leader-
+// initiated invite, which would have made it
+// indistinguishable from a participant's own join
+// request. Fixed to "invite" for correctness if this
+// is ever wired up; sendTeamInvite() below is the
+// version actually used, and the invitation.controller.js
+// TeamInvitation-based flow is what the frontend calls.
 const joinRequest = await JoinRequest.create({
   participantId: participant._id,
   teamId: team._id,
-  requestType: "join",
+  requestType: "invite",
   status: "pending",
 });
 

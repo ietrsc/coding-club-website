@@ -327,11 +327,11 @@ const visibleTeams = teams.filter(
 
               const regularMemberCount = team.members?.length || 0;
 
-const memberCount = regularMemberCount ; // Include leader
+// Leader + regular members
+const memberCount = regularMemberCount;
 
 const isFull = memberCount >= 6;
 
-// Safety check on frontend
 const isEligible =
   team.isEligible === true && memberCount === 6;
 
@@ -398,12 +398,13 @@ const isEligible =
                       ELIGIBILITY EXPLANATION
                   =================================== */}
 
-                  {!team.isEligible && (
-                    <p className="mt-4 rounded-xl bg-red-500/5 px-4 py-3 text-xs text-red-400">
-                      Not eligible — team must include
-                      at least one female participant.
-                    </p>
-                  )}
+                  {!isEligible && (
+  <p className="mt-4 rounded-xl bg-red-500/5 px-4 py-3 text-xs text-red-400">
+    {memberCount < 6 
+      ? `Not eligible — team is not full. ${memberCount}/6 members.`
+      : "Not eligible — team must include at least one female participant."}
+  </p>
+)}
 
                   {/* ==================================
                       FULL TEAM
