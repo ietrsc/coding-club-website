@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
+import GridAnimation from "../../components/GridAnimation";
+import { events } from "../../data/event";
 
 
 function Participants() {
@@ -8,21 +10,21 @@ function Participants() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sendingInvitation, setSendingInvitation] = useState(null);
-const [inviteMessage, setInviteMessage] = useState("");
-const [inviteError, setInviteError] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [inviteError, setInviteError] = useState("");
 
   const {
-  user,
-  isAuthenticated,
-  loading: authLoading,
-} = useSihAuth();
-const userParticipantId =
-  user?.participantId?._id ||
-  user?.participantId;
+    user,
+    isAuthenticated,
+    loading: authLoading,
+  } = useSihAuth();
+  const userParticipantId =
+    user?.participantId?._id ||
+    user?.participantId;
 
-const userTeamId =
-  user?.participantId?.teamId?._id ||
-  user?.participantId?.teamId;
+  const userTeamId =
+    user?.participantId?.teamId?._id ||
+    user?.participantId?.teamId;
 
 // user.participantId.teamId is now populated with
 // { _id, teamName, leaderId } by getCurrentUser, so we
@@ -32,10 +34,10 @@ const teamLeaderId =
   user?.participantId?.teamId?.leaderId?._id ||
   user?.participantId?.teamId?.leaderId;
 
-const isTeamLeader =
-  Boolean(userParticipantId) &&
-  Boolean(teamLeaderId) &&
-  userParticipantId.toString() === teamLeaderId.toString();
+  const isTeamLeader =
+    Boolean(userParticipantId) &&
+    Boolean(teamLeaderId) &&
+    userParticipantId.toString() === teamLeaderId.toString();
   const fetchParticipants = async () => {
     try {
       setLoading(true);
@@ -62,89 +64,93 @@ const isTeamLeader =
     }
   };
   const handleSendInvitation = async (participantId) => {
-  try {
-    setSendingInvitation(participantId);
-    setInviteMessage("");
-    setInviteError("");
+    try {
+      setSendingInvitation(participantId);
+      setInviteMessage("");
+      setInviteError("");
 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/invitations/invite`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          participantId,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to send invitation"
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/invitations/invite`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            participantId,
+          }),
+        }
       );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to send invitation"
+        );
+      }
+
+      setInviteMessage(
+        data.message || "Invitation sent successfully!"
+      );
+
+    } catch (error) {
+      setInviteError(
+        error.message || "Failed to send invitation"
+      );
+    } finally {
+      setSendingInvitation(null);
     }
-
-    setInviteMessage(
-      data.message || "Invitation sent successfully!"
-    );
-
-  } catch (error) {
-    setInviteError(
-      error.message || "Failed to send invitation"
-    );
-  } finally {
-    setSendingInvitation(null);
-  }
-};
+  };
 
   useEffect(() => {
     fetchParticipants();
   }, []);
 
+  const event = events.find((e) => e.slug === "sih-2026");
+
   return (
     <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
 
-      {/* Background */}
-      <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-30 pointer-events-none"
-        style={{ backgroundImage: "url('/images/backgroundImg.png')" }}
-      />
+      <div className="hidden md:block pointer-events-none">
+        <GridAnimation />
+      </div>
 
-      <div className="fixed inset-0 bg-linear-to-b from-background/80 via-background/90 to-background pointer-events-none" />
+      {/* backgroundImage*/}
+      <div
+        className="fixed inset-0 bg-cover bg-center z-0 bg-no-repeat pointer-events-none"
+        style={{ backgroundImage: `url('../images/backgroundImg.png')` }}
+      ></div>
+
+      {/*overlay layer*/}
+      <div className='fixed inset-0 bg-linear-to-b from-black/70 to-black/80 '></div>
 
       <section className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
 
-        {/* Header */}
-        <div className="text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-primary">
-            Smart India Hackathon
-          </p>
+        {/* hero section */}
 
-          <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
-            Participants Looking for Teams
-          </h1>
+        <div className='flex flex-col items-center gap-2'>
+          <h1
+            className='text-4xl  md:text-6xl font-bold
+                  max-w-3xl z-3 md:text-center'
+          ><span className='bg-linear-to-r from-primary to-highlight text-transparent bg-clip-text'>{event.title}</span></h1>
+          <h2 className='mx-3 max-w-xs sm:max-w-2xl text-muted-foreground'>These participants are currently looking for a team. If you are
+            creating a team, you can find potential teammates here.</h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base">
-            These participants are currently looking for a team. If you are
-            creating a team, you can find potential teammates here.
-          </p>
         </div>
-        {inviteMessage && (
-  <div className="mx-auto mt-6 max-w-xl rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-center text-sm text-green-600">
-    {inviteMessage}
-  </div>
-)}
 
-{inviteError && (
-  <div className="mx-auto mt-6 max-w-xl rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-500">
-    {inviteError}
-  </div>
-)}
+        {inviteMessage && (
+          <div className="mx-auto mt-6 max-w-xl rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-center text-sm text-green-600">
+            {inviteMessage}
+          </div>
+        )}
+
+        {inviteError && (
+          <div className="mx-auto mt-6 max-w-xl rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-500">
+            {inviteError}
+          </div>
+        )}
 
         {/* Loading */}
         {loading && (
@@ -173,7 +179,7 @@ const isTeamLeader =
           </div>
         )}
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
+          <Link
             to="/sih/teams"
             className="rounded-xl bg-primary px-5 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
           >
@@ -187,9 +193,13 @@ const isTeamLeader =
             Register as a participant
           </Link>
 
-          
+
 
         </div>
+
+        <p className="text-sm text-center uppercase tracking-[0.2em] font-semibold mt-8 text-primary">
+          Participants Looking for Teams
+        </p>
 
         {/* Participant cards */}
         {!loading && !error && participants.length > 0 && (
@@ -198,104 +208,211 @@ const isTeamLeader =
             {participants.map((participant) => (
               <div
                 key={participant._id}
-                className="glass rounded-2xl p-5 transition-all duration-300 hover:border-primary/50"
+                className="
+      group
+      relative
+      overflow-hidden
+      rounded-3xl
+      border border-primary/20
+      bg-white/5
+      p-6
+      backdrop-blur-md
+      transition-all
+      duration-300
+      hover:-translate-y-2
+      hover:border-primary/40
+      hover:bg-primary/5
+      hover:shadow-[0_0_35px_rgba(32,178,166,0.15)]
+    "
               >
+                {/* Ambient Glow */}
+                <div
+                  className="
+        pointer-events-none
+        absolute
+        -right-16
+        -top-16
+        h-40
+        w-40
+        rounded-full
+        bg-primary/5
+        blur-3xl
+        transition-all
+        duration-300
+        group-hover:bg-primary/10
+      "
+                />
 
-                {/* Name */}
-                <div className="flex items-start justify-between gap-3">
+                {/* Header */}
+                <div className="relative flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                      Participant
+                    </span>
 
-                  <div>
-                    <h2 className="text-lg font-semibold">
+                    <h2 className="mt-1 truncate text-xl font-bold text-white">
                       {participant.name}
                     </h2>
 
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-1 truncate text-sm text-white/45">
                       {participant.college}
                     </p>
                   </div>
 
-                  {/* Gender */}
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs capitalize text-primary">
-                    {participant.gender}
-                  </span>
+                  {participant.gender && (
+                    <span
+                      className="
+            shrink-0
+            rounded-full
+            border border-primary/20
+            bg-primary/10
+            px-3
+            py-1
+            text-xs
+            font-medium
+            capitalize
+            text-primary
+          "
+                    >
+                      {participant.gender}
+                    </span>
+                  )}
                 </div>
-                
 
-                {/* Academic information */}
-                <div className="mt-5 space-y-2 text-sm">
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
+                {/* Academic Information */}
+                <div className="relative mt-6 grid grid-cols-2 gap-3">
+                  <div
+                    className="
+          rounded-xl
+          border border-white/5
+          bg-black/20
+          p-4
+        "
+                  >
+                    <p className="text-xs text-white/40">
                       Branch
-                    </span>
+                    </p>
 
-                    <span className="font-medium">
+                    <p className="mt-1 truncate text-sm font-semibold text-white">
                       {participant.branch}
-                    </span>
+                    </p>
                   </div>
 
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
+                  <div
+                    className="
+          rounded-xl
+          border border-white/5
+          bg-black/20
+          p-4
+        "
+                  >
+                    <p className="text-xs text-white/40">
                       Year
-                    </span>
+                    </p>
 
-                    <span className="font-medium">
+                    <p className="mt-1 text-sm font-semibold text-white">
                       {participant.year}
-                    </span>
+                    </p>
                   </div>
                 </div>
-                
 
                 {/* Skills */}
-                <div className="mt-5">
-                  <p className="mb-2 text-sm text-muted-foreground">
-                    Skills
-                  </p>
+                <div className="relative mt-6">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-sm font-medium text-white/70">
+                      Skills
+                    </p>
+
+                    {participant.skills?.length > 0 && (
+                      <span className="text-xs text-white/35">
+                        {participant.skills.length} skill
+                        {participant.skills.length !== 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </div>
 
                   <div className="flex flex-wrap gap-2">
                     {participant.skills?.length > 0 ? (
                       participant.skills.map((skill, index) => (
                         <span
                           key={`${participant._id}-${index}`}
-                          className="rounded-full bg-surface px-3 py-1 text-xs text-muted-foreground"
+                          className="
+                rounded-full
+                border border-primary/15
+                bg-primary/5
+                px-3
+                py-1.5
+                text-xs
+                text-primary/80
+                transition-all
+                duration-300
+                group-hover:border-primary/25
+              "
                         >
                           {skill}
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-white/35">
                         No skills added
                       </span>
                     )}
-                    
                   </div>
-                  
                 </div>
-                {isAuthenticated && isTeamLeader && (<button
-  onClick={() =>
-    handleSendInvitation(participant._id)
-  }
-  disabled={
-    sendingInvitation === participant._id
-  }
-  className="mt-6 w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
->
-  {sendingInvitation === participant._id
-    ? "Sending..."
-    : "Send Invitation"}
-</button>)}
-                
 
+                {/* Team Leader Action */}
+                {isAuthenticated && isTeamLeader && (
+                  <button
+                    type="button"
+                    onClick={() => handleSendInvitation(participant._id)}
+                    disabled={sendingInvitation === participant._id}
+                    className="
+          relative
+          mt-7
+          w-full
+          rounded-xl
+          border border-primary
+          hover:bg-primary
+          cursor-pointer
+          px-4
+          py-3
+          text-sm
+          font-semibold
+          text-white
+          shadow-[0_0_20px_rgba(32,178,166,0.15)]
+          transition-all
+          duration-300
+          hover:-translate-y-0.5
+          hover:shadow-[0_0_30px_rgba(32,178,166,0.3)]
+          active:scale-[0.98]
+          disabled:cursor-not-allowed
+          disabled:opacity-50
+        "
+                  >
+                    {sendingInvitation === participant._id
+                      ? "Sending Invitation..."
+                      : "Invite to Join Team →"}
+                  </button>
+                )}
+
+                {/* Bottom Accent */}
+                <div
+                  className="
+        absolute
+        bottom-0
+        left-0
+        h-px
+        w-0
+        bg-primary
+        transition-all
+        duration-500
+        group-hover:w-full
+      "
+                />
               </div>
-              
-              
             ))}
-            
-
           </div>
         )}
-
-        
-
       </section>
     </div>
   );

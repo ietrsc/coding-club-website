@@ -2,8 +2,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { events } from "../data/event";
 import GridAnimation from "../components/GridAnimation";
 import { Download } from "lucide-react";
+import { useSihAuth } from "../context/SihAuthContext";
 
 function EventDetails() {
+
+   const { isAuthenticated } = useSihAuth();
 
   const {slug} = useParams();
   const navigate = useNavigate();
@@ -37,12 +40,9 @@ function EventDetails() {
         <div className='flex flex-col items-center gap-2'>
           <h1
             className='text-4xl  md:text-6xl font-bold
-            max-w-3xl z-3 '
+            max-w-3xl z-3 md:text-center'
           ><span className='bg-linear-to-r from-primary to-highlight text-transparent bg-clip-text'>{event.title}</span></h1>
           <h2 className='mx-3 max-w-xs sm:max-w-2xl text-muted-foreground'>{event.shortDescription}</h2>
-          {/* <p className='mx-3 max-w-xs sm:max-w-2xl text-muted-foreground'>
-            {event.date} || {event.time} || {event.venue}
-          </p> */}
 
         </div>
 
@@ -95,14 +95,15 @@ function EventDetails() {
           </div>
           <div className="flex justify-center mt-2  md:hidden">
             <div className=' flex justify-center items-center rounded-full border border-primary bg-primary sm:bg-surface hover:bg-linear-to-r from-primary to-highlight text-center text-white transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 active:scale-95  w-35 h-10 text-sm mt-0 sm:mt-3 cursor-pointer'>
-              <a
-                href="https://forms.gle/vbPLPBiuhjAqGGTo7"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${event.status === 'live' ? '' : 'hidden'} z-15`}
+              <button
+                onClick={isAuthenticated ? () => navigate('/sih') : ()=>navigate('/sih/login')}
+                className={`${event.status === 'live' ? '' : 'hidden'} z-15 `}
               >
-                Register Now
-              </a>
+              {
+                isAuthenticated ? "View Teams →" : "Login →"
+              }
+
+              </button>
               <a
                 className={`${event.status === 'expired' ? '' : 'hidden'} `}
                 onClick={() => navigate(`/results/${event.slug}`)}
@@ -124,17 +125,16 @@ function EventDetails() {
 
       </section>
       <div className="fixed bottom-15 right-15 z-50 hidden md:block">
-        <a
-          onClick={()=>navigate('/sih')}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={isAuthenticated ? () => navigate('/sih') : ()=>navigate('/sih/login')}
           className={`${event.status === 'live' ? '' : 'hidden'} z-15`}
         >
           <div className=' flex justify-center items-center rounded-full border border-primary bg-primary sm:bg-surface hover:bg-linear-to-r from-primary to-highlight text-center text-white transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 active:scale-95  w-35 h-10 text-sm mt-0 sm:mt-3 cursor-pointer'>
-            Register Now
-
+            {
+                isAuthenticated ? "View Teams →" : "Login →"
+              }
           </div>
-        </a>
+        </button>
         <a
           className={`${event.status === 'expired' ? '' : 'hidden'} z-10`}
           onClick={() => navigate(`/results/${event.slug}`)}

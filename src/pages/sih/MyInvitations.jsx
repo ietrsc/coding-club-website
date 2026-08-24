@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Check, Inbox, X } from "lucide-react";
+import GridAnimation from "../../components/GridAnimation";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -11,10 +13,6 @@ function MyInvitations() {
   const [processingId, setProcessingId] = useState(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-
-  // ==========================================
-  // GET MY PENDING INVITATIONS
-  // ==========================================
 
   const fetchInvitations = async () => {
     try {
@@ -38,9 +36,7 @@ function MyInvitations() {
 
       setInvitations(data.data || []);
     } catch (error) {
-      setError(
-        error.message || "Something went wrong"
-      );
+      setError(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -49,10 +45,6 @@ function MyInvitations() {
   useEffect(() => {
     fetchInvitations();
   }, []);
-
-  // ==========================================
-  // ACCEPT INVITATION
-  // ==========================================
 
   const handleAccept = async (invitationId) => {
     try {
@@ -70,34 +62,28 @@ function MyInvitations() {
 
       const data = await response.json();
 
-console.log("Accept invitation response:", data);
-
-if (!response.ok) {
-  throw new Error(
-    data.message || "Failed to accept invitation"
-  );
-}
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to accept invitation"
+        );
+      }
 
       setMessage(
         data.message || "Invitation accepted successfully!"
       );
 
-      // Remove invitation from UI
       setInvitations((previousInvitations) =>
         previousInvitations.filter(
-          (invitation) =>
-            invitation._id !== invitationId
+          (invitation) => invitation._id !== invitationId
         )
       );
       window.dispatchEvent(
   new CustomEvent("sih-invitations-changed")
 );
 
-      // Redirect to team page after success
       setTimeout(() => {
         navigate("/sih/teams");
       }, 1000);
-
     } catch (error) {
       setError(
         error.message || "Failed to accept invitation"
@@ -106,10 +92,6 @@ if (!response.ok) {
       setProcessingId(null);
     }
   };
-
-  // ==========================================
-  // REJECT INVITATION
-  // ==========================================
 
   const handleReject = async (invitationId) => {
     try {
@@ -137,11 +119,9 @@ if (!response.ok) {
         data.message || "Invitation rejected successfully"
       );
 
-      // Remove invitation from UI
       setInvitations((previousInvitations) =>
         previousInvitations.filter(
-          (invitation) =>
-            invitation._id !== invitationId
+          (invitation) => invitation._id !== invitationId
         )
       );
       window.dispatchEvent(
@@ -157,154 +137,410 @@ if (!response.ok) {
     }
   };
 
-  // ==========================================
-  // LOADING STATE
-  // ==========================================
-
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center pt-20">
-        <p className="text-muted-foreground">
-          Loading invitations...
-        </p>
+      <div className="min-h-screen flex items-center justify-center px-5 pt-24">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div
+            className="
+              h-10
+              w-10
+              rounded-full
+              border-2
+              border-primary/20
+              border-t-primary
+              animate-spin
+            "
+          />
+
+          <div>
+            <p className="text-sm font-medium text-white/70">
+              Loading invitations...
+            </p>
+
+            <p className="mt-1 text-xs text-white/40">
+              Checking your pending team invitations
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
-      <section className="mx-auto w-full max-w-6xl px-5">
+    <div className="min-h-screen px-4 pb-20 pt-28 sm:px-6">
 
-        {/* ================= HEADER ================= */}
+      <div className="hidden md:block pointer-events-none">
+        <GridAnimation />
+      </div>
 
-        <div className="text-center">
-          <p className="text-sm font-semibold tracking-wider text-primary">
+      {/* backgroundImage*/}
+      <div
+        className="fixed inset-0 bg-cover bg-center z-0 bg-no-repeat pointer-events-none"
+        style={{ backgroundImage: `url('../images/backgroundImg.png')` }}
+      ></div>
+
+      {/*overlay layer*/}
+      <div className='fixed inset-0 bg-linear-to-b from-black/70 to-black/80 '></div>
+
+      <section className="mx-auto w-full max-w-6xl animate-[fadeIn_1s_ease-in-out]">
+
+        {/* Header */}
+        <div className="relative mb-10 text-center">
+          <span
+            className="
+              inline-flex
+              rounded-full
+              border border-primary/25
+              bg-primary/10
+              px-3
+              py-1
+              text-xs
+              font-semibold
+              tracking-wider
+              text-primary
+            "
+          >
             TEAM INVITATIONS
-          </p>
+          </span>
 
-          <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
+          <h1
+            className="
+              mt-4
+              text-3xl
+              font-bold
+              text-white
+              sm:text-4xl
+              lg:text-5xl
+            "
+          >
             Your Invitations
           </h1>
 
-          <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/50 sm:text-base">
             Teams that want you as a member will appear here.
-            You can accept or reject their invitation.
+            Review their invitations and decide whether you want
+            to join.
           </p>
         </div>
 
-        {/* ================= SUCCESS MESSAGE ================= */}
-
+        {/* Success */}
         {message && (
-          <div className="mx-auto mt-8 max-w-xl rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-center text-sm text-green-600">
-            {message}
+          <div
+            className="
+              mx-auto
+              mb-6
+              max-w-2xl
+              rounded-2xl
+              border border-green-400/20
+              bg-green-400/5
+              px-5
+              py-4
+              text-center
+              backdrop-blur-md
+            "
+          >
+            <div className="flex items-center justify-center gap-2">
+              <Check className="h-4 w-4 text-green-400" />
+
+              <p className="text-sm font-medium text-green-400">
+                {message}
+              </p>
+            </div>
           </div>
         )}
 
-        {/* ================= ERROR MESSAGE ================= */}
-
+        {/* Error */}
         {error && (
-          <div className="mx-auto mt-8 max-w-xl rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-500">
-            {error}
+          <div
+            className="
+              mx-auto
+              mb-6
+              max-w-2xl
+              rounded-2xl
+              border border-red-400/20
+              bg-red-400/5
+              px-5
+              py-4
+              text-center
+              backdrop-blur-md
+            "
+          >
+            <div className="flex items-center justify-center gap-2">
+              <X className="h-4 w-4 text-red-400" />
+
+              <p className="text-sm font-medium text-red-400">
+                {error}
+              </p>
+            </div>
           </div>
         )}
 
-        {/* ================= EMPTY STATE ================= */}
-
+        {/* Empty State */}
         {!error && invitations.length === 0 && (
-          <div className="mx-auto mt-12 max-w-xl rounded-2xl border border-border p-8 text-center">
-            <h2 className="text-xl font-semibold">
+          <div
+            className="
+              mx-auto
+              mt-12
+              max-w-xl
+              rounded-3xl
+              border border-primary/20
+              bg-white/5
+              p-10
+              text-center
+              backdrop-blur-md
+              shadow-[0_0_35px_rgba(32,178,166,0.08)]
+            "
+          >
+            <div
+              className="
+                mx-auto
+                flex
+                h-16
+                w-16
+                items-center
+                justify-center
+                rounded-full
+                border border-primary/25
+                bg-primary/10
+              "
+            >
+              <Inbox className="h-8 w-8 text-primary" />
+            </div>
+
+            <h2 className="mt-5 text-2xl font-bold text-white">
               No Pending Invitations
             </h2>
 
-            <p className="mt-3 text-sm text-muted-foreground">
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/50">
               You don't have any pending team invitations right now.
+              Keep an eye on your profile as team leaders may invite
+              you to join their teams.
             </p>
+
+            <button
+              type="button"
+              onClick={() => navigate("/sih/teams")}
+              className="
+                mt-6
+                rounded-xl
+                border border-primary/25
+                bg-primary/5
+                px-6
+                py-3
+                text-sm
+                font-semibold
+                text-primary
+                transition-all
+                duration-300
+                hover:-translate-y-1
+                hover:border-primary/50
+                hover:bg-primary/10
+                active:scale-95
+                cursor-pointer
+              "
+            >
+              Browse Teams →
+            </button>
           </div>
         )}
 
-        {/* ================= INVITATION CARDS ================= */}
-
+        {/* Invitations */}
         {invitations.length > 0 && (
-          <div className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {invitations.map((invitation) => {
+              const isProcessing =
+                processingId === invitation._id;
 
-            {invitations.map((invitation) => (
-              <div
-                key={invitation._id}
-                className="glass rounded-2xl border border-border p-6"
-              >
-                {/* Team Info */}
+              return (
+                <div
+                  key={invitation._id}
+                  className="
+                    group
+                    relative
+                    overflow-hidden
+                    rounded-3xl
+                    border border-primary/20
+                    bg-white/5
+                    p-6
+                    backdrop-blur-md
+                    transition-all
+                    duration-300
+                    hover:-translate-y-2
+                    hover:border-primary/40
+                    hover:bg-primary/5
+                    hover:shadow-[0_0_35px_rgba(32,178,166,0.15)]
+                  "
+                >
+                  {/* Glow */}
+                  <div
+                    className="
+                      pointer-events-none
+                      absolute
+                      -right-16
+                      -top-16
+                      h-40
+                      w-40
+                      rounded-full
+                      bg-primary/5
+                      blur-3xl
+                      transition-all
+                      duration-300
+                      group-hover:bg-primary/10
+                    "
+                  />
 
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-medium tracking-wider text-primary">
-                      TEAM INVITATION
-                    </p>
+                  {/* Header */}
+                  <div className="relative flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                        Team Invitation
+                      </p>
 
-                    <h2 className="mt-2 text-xl font-bold">
-                      {invitation.teamId?.teamName || "Team"}
-                    </h2>
+                      <h2 className="mt-2 truncate text-2xl font-bold text-white">
+                        {invitation.teamId?.teamName || "Team"}
+                      </h2>
+                    </div>
+
+                    <span
+                      className="
+                        shrink-0
+                        rounded-full
+                        border border-yellow-400/20
+                        bg-yellow-400/10
+                        px-3
+                        py-1
+                        text-xs
+                        font-semibold
+                        text-yellow-300
+                      "
+                    >
+                      Pending
+                    </span>
                   </div>
 
-                  <span className="rounded-full bg-yellow-500/10 px-3 py-1 text-xs font-medium text-yellow-600">
-                    Pending
-                  </span>
-                </div>
-
-                {/* Leader Info */}
-
-                <div className="mt-5 rounded-xl border border-border bg-surface p-4">
-                  <p className="text-xs text-muted-foreground">
-                    Team Leader
-                  </p>
-
-                  <p className="mt-1 font-medium">
-                    {invitation.teamId?.leaderId?.name ||
-                      "Unknown"}
-                  </p>
-
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {invitation.teamId?.leaderId?.email || ""}
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-
-                <div className="mt-6 grid grid-cols-2 gap-3">
-
-                  <button
-                    onClick={() =>
-                      handleReject(invitation._id)
-                    }
-                    disabled={
-                      processingId === invitation._id
-                    }
-                    className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold transition hover:border-red-500 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  {/* Leader */}
+                  <div
+                    className="
+                      relative
+                      mt-6
+                      rounded-2xl
+                      border border-white/5
+                      bg-black/20
+                      p-5
+                    "
                   >
-                    {processingId === invitation._id
-                      ? "Processing..."
-                      : "Reject"}
-                  </button>
+                    <p className="text-xs font-medium uppercase tracking-wider text-white/35">
+                      Invited by
+                    </p>
 
-                  <button
-                    onClick={() =>
-                      handleAccept(invitation._id)
-                    }
-                    disabled={
-                      processingId === invitation._id
-                    }
-                    className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {processingId === invitation._id
-                      ? "Processing..."
-                      : "Accept"}
-                  </button>
+                    <p className="mt-2 text-lg font-semibold text-white">
+                      {invitation.teamId?.leaderId?.name ||
+                        "Unknown"}
+                    </p>
 
+                    {invitation.teamId?.leaderId?.email && (
+                      <p className="mt-1 truncate text-sm text-white/45">
+                        {invitation.teamId.leaderId.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="relative mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleReject(invitation._id)
+                      }
+                      disabled={isProcessing}
+                      className="
+                        rounded-xl
+                        border border-red-400/20
+                        bg-red-400/5
+                        px-4
+                        py-3
+                        text-sm
+                        font-semibold
+                        text-red-400
+                        transition-all
+                        duration-300
+                        hover:-translate-y-0.5
+                        hover:border-red-400/40
+                        hover:bg-red-400/10
+                        active:scale-[0.98]
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50
+                      "
+                    >
+                      {isProcessing ? "Processing..." : "Reject"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleAccept(invitation._id)
+                      }
+                      disabled={isProcessing}
+                      className="
+                        rounded-xl
+                        bg-primary
+                        px-4
+                        py-3
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-[0_0_20px_rgba(32,178,166,0.15)]
+                        transition-all
+                        duration-300
+                        hover:-translate-y-0.5
+                        hover:bg-primary2
+                        hover:shadow-[0_0_30px_rgba(32,178,166,0.3)]
+                        active:scale-[0.98]
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50
+                      "
+                    >
+                      {isProcessing ? "Processing..." : "Accept →"}
+                    </button>
+                  </div>
+
+                  {/* Bottom Accent */}
+                  <div
+                    className="
+                      absolute
+                      bottom-0
+                      left-0
+                      h-px
+                      w-0
+                      bg-primary
+                      transition-all
+                      duration-500
+                      group-hover:w-full
+                    "
+                  />
                 </div>
-              </div>
-            ))}
-
+              );
+            })}
           </div>
         )}
+
+        {/* Back */}
+        <div className="mt-12 text-center">
+          <button
+            type="button"
+            onClick={() => navigate("/sih")}
+            className="
+              text-sm
+              text-white/40
+              transition-colors
+              duration-300
+              hover:text-primary
+            "
+          >
+            ← Back to SIH
+          </button>
+        </div>
 
       </section>
     </div>

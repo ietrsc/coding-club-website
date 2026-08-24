@@ -195,12 +195,13 @@ function Navbar() {
             DESKTOP SIH AUTH
         ========================================= */}
 
-        <div className={`hidden md:flex items-center gap-3 ${location.pathname == "/sih" ? "" : "md:hidden"}`}>
+
+        <div className={`hidden  items-center gap-3 ${location.pathname.includes("/sih") ? "md:flex": "md:hidden"} ${isAuthenticated ? "md:flex": "md:hidden"}`}>
           {isAuthenticated ? (
             <>
               <Link
                 to="/sih/invitations"
-                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-primary/10 hover:text-primary"
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-primary/10 hover:text-primary ${location.pathname == "/sih/invitations" ? "bg-primary/10 text-primary" : ""}`}
               >
                 <span>Invitations</span>
 
@@ -233,7 +234,7 @@ function Navbar() {
 
               <Link
                 to="/sih/signup"
-                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                className="rounded-xl border bg-surface hover:bg-primary border-primary px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
               >
                 SIH Sign Up
               </Link>
@@ -313,8 +314,12 @@ function Navbar() {
             MOBILE SIH AUTH
         ========================================= */}
 
+        <div className={`${
+            location.pathname.includes("/sih") ?  isAuthenticated ? "flex": "hidden" : ""
+          } `}>
+
         {isAuthenticated ? (
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex justify-evenly items-center gap-3">
             <span className="text-sm text-foreground">
               {user?.participantId?.name || "Participant"}
             </span>
@@ -346,6 +351,9 @@ function Navbar() {
             </Link>
           </div>
         )}
+
+        </div>
+
       </div>
     </header>
   );

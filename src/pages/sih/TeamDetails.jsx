@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
+import GridAnimation from "../../components/GridAnimation";
+
 
 function TeamDetails() {
   const { teamId } = useParams();
@@ -29,15 +31,11 @@ function TeamDetails() {
     useState("");
   const [requestMessage, setRequestMessage] =
     useState("");
-// team.members already includes the leader (see
-// team.controller.js createTeam), so no +1 is needed
-// here — adding one double-counted the leader and made
-// this badge unable to ever show "Eligible".
-const totalMembers = team?.members?.length || 0;
+  const totalMembers = (team?.members?.length || 0);
 
-const isEligible =
-  team?.isEligible === true &&
-  totalMembers === 6;
+  const isEligible =
+    team?.isEligible === true &&
+    totalMembers === 6;
 
   // ==========================================
   // FETCH TEAM
@@ -106,7 +104,7 @@ const isEligible =
       if (!response.ok) {
         throw new Error(
           data.message ||
-            "Failed to fetch join requests"
+          "Failed to fetch join requests"
         );
       }
 
@@ -114,7 +112,7 @@ const isEligible =
     } catch (err) {
       setRequestError(
         err.message ||
-          "Failed to fetch join requests"
+        "Failed to fetch join requests"
       );
     } finally {
       setRequestsLoading(false);
@@ -172,7 +170,7 @@ const isEligible =
       if (!response.ok) {
         throw new Error(
           data.message ||
-            "Failed to remove member"
+          "Failed to remove member"
         );
       }
 
@@ -182,7 +180,7 @@ const isEligible =
     } catch (err) {
       setError(
         err.message ||
-          "Failed to remove member"
+        "Failed to remove member"
       );
     } finally {
       setRemoving(null);
@@ -220,13 +218,13 @@ const isEligible =
       if (!response.ok) {
         throw new Error(
           data.message ||
-            "Failed to accept join request"
+          "Failed to accept join request"
         );
       }
 
       setRequestMessage(
         data.message ||
-          "Join request accepted successfully"
+        "Join request accepted successfully"
       );
 
       setTeam(data.data?.team || team);
@@ -242,7 +240,7 @@ const isEligible =
     } catch (err) {
       setRequestError(
         err.message ||
-          "Failed to accept join request"
+        "Failed to accept join request"
       );
     } finally {
       setProcessingRequest(null);
@@ -250,46 +248,44 @@ const isEligible =
   };
 
   const handleDeleteTeam = async () => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this team? This action cannot be undone."
-  );
-
-  if (!confirmed) return;
-
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/teams/${teamId}`,
-      {
-        method: "DELETE",
-        credentials: "include",
-      }
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this team? This action cannot be undone."
     );
 
-    const data = await response.json();
+    if (!confirmed) return;
 
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to delete team"
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/teams/${teamId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to delete team"
+        );
+      }
+
+      alert("Team deleted successfully");
+
+      navigate("/sih/teams");
+
+    } catch (error) {
+      console.error(
+        "Delete team error:",
+        error
+      );
+
+      alert(
+        error.message || "Failed to delete team"
       );
     }
-
-    alert("Team deleted successfully");
-
-    await fetchCurrentUser()
-
-    navigate("/sih/teams");
-
-  } catch (error) {
-    console.error(
-      "Delete team error:",
-      error
-    );
-
-    alert(
-      error.message || "Failed to delete team"
-    );
-  }
-};
+  };
   // ==========================================
   // REJECT JOIN REQUEST
   // ==========================================
@@ -321,13 +317,13 @@ const isEligible =
       if (!response.ok) {
         throw new Error(
           data.message ||
-            "Failed to reject join request"
+          "Failed to reject join request"
         );
       }
 
       setRequestMessage(
         data.message ||
-          "Join request rejected successfully"
+        "Join request rejected successfully"
       );
 
       setRequests((prevRequests) =>
@@ -339,7 +335,7 @@ const isEligible =
     } catch (err) {
       setRequestError(
         err.message ||
-          "Failed to reject join request"
+        "Failed to reject join request"
       );
     } finally {
       setProcessingRequest(null);
@@ -367,6 +363,7 @@ const isEligible =
   if (error && !team) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
+
         <div className="w-full max-w-md rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center">
 
           <h2 className="text-xl font-semibold text-red-500">
@@ -404,311 +401,659 @@ const isEligible =
   const leader = team.leaderId;
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-20">
 
-      {/* ==========================================
-          BACKGROUND
-      =========================================== */}
+      {/* Background */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <GridAnimation />
 
-      <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-30 pointer-events-none"
-        style={{
-          backgroundImage:
-            "url('/images/backgroundImg.png')",
-        }}
-      />
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+          style={{
+            backgroundImage:
+              "url('../../images/backgroundImg.png')",
+          }}
+        />
 
-      <div className="fixed inset-0 bg-linear-to-b from-background/80 via-background/90 to-background pointer-events-none" />
+        <div className="absolute inset-0 bg-black/10" />
+      </div>
 
-      <section className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6">
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6">
 
-        {/* ==========================================
-            BACK
-        =========================================== */}
-
+        {/* Back */}
         <Link
           to="/sih/teams"
-          className="inline-flex items-center text-sm text-muted-foreground transition hover:text-primary"
+          className="
+          inline-flex
+          items-center
+          gap-2
+          text-sm
+          text-white/45
+          transition-all
+          duration-300
+          hover:translate-x-[-2px]
+          hover:text-primary
+        "
         >
           ← Back to Teams
         </Link>
 
-        {/* ==========================================
-            TEAM HEADER
-        =========================================== */}
+        {/* ==================================================
+          TEAM PROFILE HEADER
+      ================================================== */}
+        <div
+          className="
+          relative
+          mt-6
+          overflow-hidden
+          rounded-[2rem]
+          border border-primary/25
+          bg-gradient-to-br
+          from-primary/10
+          via-white/5
+          to-transparent
+          p-6
+          sm:p-8
+          lg:p-10
+          backdrop-blur-xl
+          shadow-[0_0_60px_rgba(32,178,166,0.10)]
+        "
+        >
+          {/* Glow */}
+          <div
+            className="
+            pointer-events-none
+            absolute
+            -right-32
+            -top-32
+            h-80
+            w-80
+            rounded-full
+            bg-primary/15
+            blur-[100px]
+          "
+          />
 
-        <div className="glass-strong mt-5 rounded-2xl p-6 sm:p-8">
+          <div
+            className="
+            pointer-events-none
+            absolute
+            -bottom-32
+            -left-32
+            h-72
+            w-72
+            rounded-full
+            bg-primary/5
+            blur-[90px]
+          "
+          />
 
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+          <div className="relative">
 
-            <div>
+            {/* Top row */}
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
 
-              <p className="text-sm font-medium uppercase tracking-widest text-primary">
-                SIH Team
-              </p>
+              <div className="flex items-start gap-5">
 
-              <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
-                {team.teamName}
-              </h1>
+                {/* Team Logo / Initial */}
+                <div
+                  className="
+                  flex
+                  h-20
+                  w-20
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  border
+                  border-primary/30
+                  bg-primary/10
+                  text-3xl
+                  font-black
+                  text-primary
+                  shadow-[0_0_30px_rgba(32,178,166,0.15)]
+                  sm:h-24
+                  sm:w-24
+                  sm:text-4xl
+                "
+                >
+                  {team.teamName?.charAt(0)?.toUpperCase()}
+                </div>
 
-              <p className="mt-2 text-sm text-muted-foreground">
-                {team.members?.length || 0} team member
-                {team.members?.length !== 1
-                  ? "s"
-                  : ""}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary">
+                    SIH Internal Hackathon
+                  </p>
+
+                  <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
+                    {team.teamName}
+                  </h1>
+
+                  <p className="mt-2 text-sm text-white/45">
+                    Team Leader:{" "}
+                    <span className="font-semibold text-white/80">
+                      {leader?.name || "Unknown"}
+                    </span>
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Status */}
+              <div>
+                {isEligible ? (
+                  <div
+                    className="
+                    inline-flex
+                    items-center
+                    gap-2
+                    rounded-full
+                    border border-green-400/20
+                    bg-green-400/10
+                    px-4
+                    py-2
+                    text-sm
+                    font-semibold
+                    text-green-400
+                  "
+                  >
+                    <span className="h-2 w-2 rounded-full bg-green-400" />
+                    Eligible
+                  </div>
+                ) : (
+                  <div
+                    className="
+                    inline-flex
+                    items-center
+                    gap-2
+                    rounded-full
+                    border border-yellow-400/20
+                    bg-yellow-400/10
+                    px-4
+                    py-2
+                    text-sm
+                    font-semibold
+                    text-yellow-300
+                  "
+                  >
+                    <span className="h-2 w-2 rounded-full bg-yellow-300" />
+                    Incomplete
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            {/* Member progress */}
+            <div className="mt-8">
+
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-medium uppercase tracking-wider text-white/40">
+                  Team Completion
+                </span>
+
+                <span className="text-sm font-bold text-primary">
+                  {totalMembers} / 6
+                </span>
+              </div>
+
+              <div className="h-2 overflow-hidden rounded-full bg-white/5">
+                <div
+                  className="
+                  h-full
+                  rounded-full
+                  bg-gradient-to-r
+                  from-primary
+                  to-teal-300
+                  shadow-[0_0_15px_rgba(32,178,166,0.5)]
+                  transition-all
+                  duration-500
+                "
+                  style={{
+                    width: `${Math.min((totalMembers / 6) * 100, 100)}%`,
+                  }}
+                />
+              </div>
+
+              <p className="mt-3 text-xs leading-relaxed text-white/40">
+                {isEligible
+                  ? "This team has completed the required team composition and is eligible to participate."
+                  : "This team can continue adding members until the required team size is reached."}
               </p>
 
             </div>
-            
-
-            {/* Eligibility */}
-
-            {isEligible ? (
-                      <span className="shrink-0 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-500">
-                        Eligible ✓
-                      </span>
-                    ) : (
-                      <span className="shrink-0 rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-500">
-                        Not Eligible
-                      </span>
-                    )}
 
           </div>
-          
-
         </div>
 
-        {/* ==========================================
-            GENERAL ERROR
-        =========================================== */}
-
+        {/* General error */}
         {error && (
-          <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-500">
+          <div
+            className="
+            mt-5
+            rounded-2xl
+            border border-red-400/20
+            bg-red-400/5
+            px-5
+            py-4
+            text-sm
+            text-red-400
+          "
+          >
             {error}
           </div>
         )}
-        
 
-        {/* ==========================================
-            TEAM LEADER
-        =========================================== */}
+        {/* ==================================================
+          TEAM MEMBERS
+      ================================================== */}
+        <section className="mt-12">
 
-        <div className="mt-8">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                The Squad
+              </p>
 
-          <h2 className="mb-4 text-xl font-semibold">
-            Team Leader
-          </h2>
+              <h2 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
+                Team Members
+              </h2>
+            </div>
 
-          <div className="glass-strong rounded-2xl p-6">
+            <span className="rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+              {totalMembers} / 6
+            </span>
+          </div>
 
+          {/* Leader */}
+          <div
+            className="
+            mb-5
+            relative
+            overflow-hidden
+            rounded-3xl
+            border border-primary/25
+            bg-gradient-to-r
+            from-primary/10
+            to-transparent
+            p-6
+            backdrop-blur-md
+          "
+          >
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
 
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">
-                {leader?.name
-                  ?.charAt(0)
-                  ?.toUpperCase()}
+              <div
+                className="
+                flex
+                h-16
+                w-16
+                shrink-0
+                items-center
+                justify-center
+                rounded-2xl
+                border border-primary/30
+                bg-primary/10
+                text-2xl
+                font-bold
+                text-primary
+                shadow-[0_0_20px_rgba(32,178,166,0.12)]
+              "
+              >
+                {leader?.name?.charAt(0)?.toUpperCase()}
               </div>
 
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-xl font-bold text-white">
+                    {leader?.name}
+                  </h3>
 
-                <h3 className="text-xl font-semibold">
-                  {leader?.name}
-                </h3>
+                  <span
+                    className="
+                    rounded-full
+                    bg-primary/10
+                    px-2.5
+                    py-1
+                    text-[10px]
+                    font-bold
+                    uppercase
+                    tracking-wider
+                    text-primary
+                  "
+                  >
+                    Leader
+                  </span>
+                </div>
 
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-sm text-white/40">
                   {leader?.email}
                 </p>
 
-                <div className="mt-3 flex flex-wrap gap-2">
+                {/* <p className="mt-1 text-sm text-white/40">
+                  {leader?.phone}
+                </p> */}
 
+                <div className="mt-3 flex flex-wrap gap-2">
                   {leader?.branch && (
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+                    <span className="rounded-full bg-black/20 px-3 py-1 text-xs text-white/55">
                       {leader.branch}
                     </span>
                   )}
 
                   {leader?.year && (
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+                    <span className="rounded-full bg-black/20 px-3 py-1 text-xs text-white/55">
                       Year {leader.year}
                     </span>
                   )}
 
                   {leader?.department && (
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
+                    <span className="rounded-full bg-black/20 px-3 py-1 text-xs text-white/55">
                       {leader.department}
                     </span>
                   )}
-
                 </div>
-
               </div>
 
-              <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                Team Leader
-              </span>
-
             </div>
-
           </div>
 
-        </div>
+          {/* Other Members */}
+          <div className="grid gap-5 sm:grid-cols-2">
 
-        {/* ==========================================
-            JOIN REQUESTS — LEADER ONLY
-        =========================================== */}
+            {team.members?.map((member) => {
 
+              const isLeader = member._id === leader?._id;
+
+              if (isLeader) return null;
+
+              return (
+                <div
+                  key={member._id}
+                  className="
+                  group
+                  relative
+                  overflow-hidden
+                  rounded-3xl
+                  border border-white/10
+                  bg-white/5
+                  p-5
+                  backdrop-blur-md
+                  transition-all
+                  duration-300
+                  hover:-translate-y-1
+                  hover:border-primary/25
+                  hover:bg-primary/5
+                "
+                >
+
+                  <div className="flex gap-4">
+
+                    <div
+                      className="
+                      flex
+                      h-12
+                      w-12
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-xl
+                      border border-white/10
+                      bg-black/20
+                      font-semibold
+                      text-primary
+                    "
+                    >
+                      {member.name?.charAt(0)?.toUpperCase()}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+
+                      <h3 className="truncate font-semibold text-white">
+                        {member.name}
+                      </h3>
+
+                      {isTeamLeader && (
+                        <>
+                          <p className="mt-1 text-sm text-white/40">
+                            {member.email}
+                          </p>
+
+                          <p className="mt-1 text-sm text-white/40">
+                            {member.phone}
+                          </p>
+                        </>
+                      )}
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {member.branch && (
+                          <span className="rounded-full bg-black/20 px-2.5 py-1 text-xs text-white/55">
+                            {member.branch}
+                          </span>
+                        )}
+
+                        {member.year && (
+                          <span className="rounded-full bg-black/20 px-2.5 py-1 text-xs text-white/55">
+                            Year {member.year}
+                          </span>
+                        )}
+                      </div>
+
+                      {member.skills?.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {member.skills.map((skill, index) => (
+                            <span
+                              key={index}
+                              className="text-xs text-primary/80"
+                            >
+                              #{skill}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                    </div>
+
+                  </div>
+
+                  {isTeamLeader && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRemoveMember(member._id)
+                      }
+                      disabled={removing === member._id}
+                      className="
+                      mt-5
+                      w-full
+                      rounded-xl
+                      border border-red-400/15
+                      bg-red-400/5
+                      px-4
+                      py-2.5
+                      text-xs
+                      font-semibold
+                      text-red-400
+                      transition-all
+                      duration-300
+                      hover:border-red-400/30
+                      hover:bg-red-400/10
+                      disabled:cursor-not-allowed
+                      disabled:opacity-50
+                    "
+                    >
+                      {removing === member._id
+                        ? "Removing..."
+                        : "Remove Member"}
+                    </button>
+                  )}
+
+                </div>
+              );
+            })}
+
+          </div>
+        </section>
+
+        {/* ==================================================
+          JOIN REQUESTS
+      ================================================== */}
         {isTeamLeader && (
-          <div className="mt-10">
+          <section className="mt-12">
 
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                  Team Control
+                </p>
 
-              <h2 className="text-xl font-semibold">
-                Join Requests
-              </h2>
+                <h2 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
+                  Join Requests
+                </h2>
+              </div>
 
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <span className="rounded-full border border-yellow-400/20 bg-yellow-400/10 px-3 py-1 text-xs font-semibold text-yellow-300">
                 {requests.length} Pending
               </span>
-
             </div>
 
             {requestMessage && (
-              <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-500">
+              <div className="mb-4 rounded-2xl border border-green-400/20 bg-green-400/5 px-5 py-4 text-sm text-green-400">
                 {requestMessage}
               </div>
             )}
 
             {requestError && (
-              <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-500">
+              <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-400/5 px-5 py-4 text-sm text-red-400">
                 {requestError}
               </div>
             )}
 
             {requestsLoading ? (
-              <div className="glass-strong rounded-2xl p-6 text-center text-sm text-muted-foreground">
-                Loading join requests...
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-sm text-white/40 backdrop-blur-md">
+                Loading requests...
               </div>
             ) : requests.length === 0 ? (
-              <div className="glass-strong rounded-2xl p-6 text-center">
-
-                <h3 className="font-semibold">
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-md">
+                <h3 className="font-semibold text-white">
                   No pending requests
                 </h3>
 
-                <p className="mt-2 text-sm text-muted-foreground">
-                  New join requests will appear here.
+                <p className="mt-2 text-sm text-white/40">
+                  New requests from students will appear here.
                 </p>
-
               </div>
             ) : (
               <div className="space-y-4">
-
                 {requests.map((request) => {
 
                   const participant =
                     request.participantId;
 
                   const isProcessing =
-                    processingRequest ===
-                    request._id;
+                    processingRequest === request._id;
 
                   return (
                     <div
                       key={request._id}
-                      className="glass-strong rounded-2xl p-5"
+                      className="
+                      rounded-3xl
+                      border border-white/10
+                      bg-white/5
+                      p-5
+                      backdrop-blur-md
+                    "
                     >
+                      <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
 
-                      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+                        <div className="flex min-w-0 flex-1 gap-4">
 
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                          {participant?.name
-                            ?.charAt(0)
-                            ?.toUpperCase()}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-
-                          <div className="flex flex-wrap items-center gap-2">
-
-                            <h3 className="font-semibold">
-                              {participant?.name ||
-                                "Unknown Participant"}
-                            </h3>
-
-                            <span className="rounded-full bg-yellow-500/10 px-2.5 py-1 text-[10px] font-medium text-yellow-500">
-                              Pending
-                            </span>
-
+                          <div
+                            className="
+                            flex
+                            h-12
+                            w-12
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-xl
+                            bg-primary/10
+                            text-primary
+                          "
+                          >
+                            {participant?.name
+                              ?.charAt(0)
+                              ?.toUpperCase()}
                           </div>
 
-                          <p className="mt-1 break-all text-sm text-muted-foreground">
-                            {participant?.email}
-                          </p>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-semibold text-white">
+                                {participant?.name ||
+                                  "Unknown Participant"}
+                              </h3>
 
-                          <div className="mt-3 flex flex-wrap gap-2">
-
-                            {participant?.phone && (
-                              <span className="rounded-full bg-muted px-2.5 py-1 text-xs">
-                                {participant.phone}
+                              <span className="rounded-full bg-yellow-400/10 px-2.5 py-1 text-[10px] font-semibold text-yellow-300">
+                                Pending
                               </span>
-                            )}
+                            </div>
 
-                            {participant?.branch && (
-                              <span className="rounded-full bg-muted px-2.5 py-1 text-xs">
-                                {participant.branch}
-                              </span>
-                            )}
-
-                            {participant?.year && (
-                              <span className="rounded-full bg-muted px-2.5 py-1 text-xs">
-                                Year {participant.year}
-                              </span>
-                            )}
-
-                            {participant?.gender && (
-                              <span className="rounded-full bg-muted px-2.5 py-1 text-xs capitalize">
-                                {participant.gender}
-                              </span>
-                            )}
-
-                          </div>
-
-                          {participant?.department && (
-                            <p className="mt-3 text-xs text-muted-foreground">
-                              {participant.department}
+                            <p className="mt-1 truncate text-sm text-white/40">
+                              {participant?.email}
                             </p>
-                          )}
 
-                          {participant?.skills?.length > 0 && (
-                            <div className="mt-3 flex flex-wrap gap-1.5">
-
-                              {participant.skills.map(
-                                (skill, index) => (
-                                  <span
-                                    key={index}
-                                    className="text-xs text-primary"
-                                  >
-                                    #{skill}
-                                  </span>
-                                )
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {participant?.branch && (
+                                <span className="rounded-full bg-black/20 px-2.5 py-1 text-xs text-white/55">
+                                  {participant.branch}
+                                </span>
                               )}
 
+                              {participant?.year && (
+                                <span className="rounded-full bg-black/20 px-2.5 py-1 text-xs text-white/55">
+                                  Year {participant.year}
+                                </span>
+                              )}
                             </div>
-                          )}
+
+                            {participant?.skills?.length > 0 && (
+                              <div className="mt-3 flex flex-wrap gap-1.5">
+                                {participant.skills.map(
+                                  (skill, index) => (
+                                    <span
+                                      key={index}
+                                      className="text-xs text-primary"
+                                    >
+                                      #{skill}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            )}
+                          </div>
 
                         </div>
 
-                        <div className="flex shrink-0 flex-col gap-2 sm:w-32">
-
+                        <div className="flex gap-2 lg:w-52 lg:flex-col">
                           <button
                             type="button"
                             onClick={() =>
-                              handleAcceptRequest(
-                                request._id
-                              )
+                              handleAcceptRequest(request._id)
                             }
                             disabled={isProcessing}
-                            className="rounded-xl bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="
+                            flex-1
+                            rounded-xl
+                            bg-primary
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-semibold
+                            text-white
+                            transition-all
+                            duration-300
+                            hover:bg-primary2
+                            disabled:opacity-50
+                          "
                           >
                             {isProcessing
                               ? "Processing..."
@@ -718,230 +1063,143 @@ const isEligible =
                           <button
                             type="button"
                             onClick={() =>
-                              handleRejectRequest(
-                                request._id
-                              )
+                              handleRejectRequest(request._id)
                             }
                             disabled={isProcessing}
-                            className="rounded-xl border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="
+                            flex-1
+                            rounded-xl
+                            border border-red-400/20
+                            bg-red-400/5
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-semibold
+                            text-red-400
+                            transition-all
+                            duration-300
+                            hover:bg-red-400/10
+                            disabled:opacity-50
+                          "
                           >
                             Reject
                           </button>
-
                         </div>
 
                       </div>
-
                     </div>
                   );
                 })}
-
               </div>
             )}
-
-          </div>
+          </section>
         )}
 
-        {/* ==========================================
-            MEMBERS
-        =========================================== */}
+        {/* ==================================================
+          TEAM DETAILS
+      ================================================== */}
+        <section className="mt-12">
 
-        <div className="mt-10">
+          <div className="mb-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              Team Identity
+            </p>
 
-          <div className="mb-4 flex items-center justify-between">
-
-            <h2 className="text-xl font-semibold">
-              Team Members
+            <h2 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
+              Team Details
             </h2>
-
-            <span className="text-sm text-muted-foreground">
-              {team.members?.length || 0} Members
-            </span>
-
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div
+            className="
+            rounded-3xl
+            border border-white/10
+            bg-white/5
+            p-6
+            backdrop-blur-md
+          "
+          >
+            <div className="grid gap-6 sm:grid-cols-2">
 
-            {team.members?.map((member) => {
+              <div>
+                <p className="text-xs uppercase tracking-wider text-white/30">
+                  Team ID
+                </p>
 
-              const isLeader =
-                member._id === leader?._id;
+                <p className="mt-2 break-all text-sm font-medium text-white/80">
+                  {team._id}
+                </p>
+              </div>
 
-              return (
-                <div
-                  key={member._id}
-                  className="glass-strong rounded-2xl p-5"
-                >
+              <div>
+                <p className="text-xs uppercase tracking-wider text-white/30">
+                  Created
+                </p>
 
-                  <div className="flex items-start gap-4">
-
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                      {member.name
-                        ?.charAt(0)
-                        ?.toUpperCase()}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-
-                      <div className="flex flex-wrap items-center gap-2">
-
-                        <h3 className="font-semibold">
-                          {member.name}
-                        </h3>
-
-                        {isLeader && (
-                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-                            Leader
-                          </span>
-                        )}
-
-                      </div>
-
-                      <p className="mt-1 break-all text-sm text-muted-foreground">
-                        {member.email}
-                      </p>
-
-                      {member.phone && (
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {member.phone}
-                        </p>
-                      )}
-
-                      <div className="mt-3 flex flex-wrap gap-2">
-
-                        {member.branch && (
-                          <span className="rounded-full bg-muted px-2.5 py-1 text-xs">
-                            {member.branch}
-                          </span>
-                        )}
-
-                        {member.year && (
-                          <span className="rounded-full bg-muted px-2.5 py-1 text-xs">
-                            Year {member.year}
-                          </span>
-                        )}
-
-                        {member.gender && (
-                          <span className="rounded-full bg-muted px-2.5 py-1 text-xs capitalize">
-                            {member.gender}
-                          </span>
-                        )}
-
-                      </div>
-
-                      {member.skills?.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-
-                          {member.skills.map(
-                            (skill, index) => (
-                              <span
-                                key={index}
-                                className="text-xs text-primary"
-                              >
-                                #{skill}
-                              </span>
-                            )
-                          )}
-
-                        </div>
-                      )}
-
-                    </div>
-
-                  </div>
-
-                  {/* ==================================
-                      REMOVE — LEADER ONLY
-                  =================================== */}
-
-                  {isTeamLeader &&
-                    !isLeader && (
-                      <button
-                        onClick={() =>
-                          handleRemoveMember(
-                            member._id
-                          )
-                        }
-                        disabled={
-                          removing === member._id
-                        }
-                        className="mt-5 w-full rounded-xl border border-red-500/20 px-4 py-2.5 text-xs font-medium text-red-500 transition hover:bg-red-500/10 disabled:opacity-50"
-                      >
-                        {removing === member._id
-                          ? "Removing..."
-                          : "Remove Member"}
-                      </button>
-                    )}
-
-                </div>
-              );
-            })}
-
-          </div>
-
-        </div>
-
-        {/* ==========================================
-            TEAM INFO
-        =========================================== */}
-
-        <div className="mt-10 rounded-2xl border border-primary/20 bg-primary/5 p-5">
-
-          <h3 className="font-semibold">
-            Team Information
-          </h3>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-
-            <div>
-              <p className="text-xs text-muted-foreground">
-                Team ID
-              </p>
-
-              <p className="mt-1 break-all text-sm font-medium">
-                {team._id}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs text-muted-foreground">
-                Created
-              </p>
-
-              <p className="mt-1 text-sm font-medium">
-                {team.createdAt
-                  ? new Date(
+                <p className="mt-2 text-sm font-medium text-white/80">
+                  {team.createdAt
+                    ? new Date(
                       team.createdAt
                     ).toLocaleDateString()
-                  : "—"}
-              </p>
+                    : "—"}
+                </p>
+              </div>
+
             </div>
-
           </div>
+        </section>
 
-        </div>
-
-        {/* ==========================================
-            ACTIONS
-        =========================================== */}
-
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        {/* ==================================================
+          ACTIONS
+      ================================================== */}
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
 
           <Link
             to="/sih/teams"
-            className="flex-1 rounded-xl border border-border px-5 py-3 text-center text-sm font-medium transition hover:bg-muted"
+            className="
+            flex-1
+            rounded-xl
+            border border-primary/20
+            bg-white/5
+            px-5
+            py-3
+            text-center
+            text-sm
+            font-semibold
+            text-white
+            transition-all
+            duration-300
+            hover:border-primary/40
+            hover:bg-primary/10
+            hover:text-primary
+          "
           >
-            View All Teams
+            ← View All Teams
           </Link>
 
           {isTeamLeader && (
-  <button
-    onClick={handleDeleteTeam}
-    className="rounded-xl border border-red-500 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500 hover:text-white"
-  >
-    Delete Team
-  </button>
-)}
+            <button
+              type="button"
+              onClick={handleDeleteTeam}
+              className="
+              rounded-xl
+              border border-red-400/20
+              bg-red-400/5
+              px-5
+              py-3
+              text-sm
+              font-semibold
+              text-red-400
+              transition-all
+              duration-300
+              hover:border-red-400/40
+              hover:bg-red-500
+              hover:text-white
+            "
+            >
+              Delete Team
+            </button>
+          )}
 
         </div>
 

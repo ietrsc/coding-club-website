@@ -32,7 +32,7 @@ function SIHHome() {
         <div className='flex flex-col items-center gap-2 '>
           <h1
             className='text-4xl  md:text-6xl font-bold
-                  max-w-3xl z-3 '
+                  max-w-3xl z-3 md:text-center'
           ><span className='bg-linear-to-r from-primary to-highlight text-transparent bg-clip-text'>{event.title}</span></h1>
           <h2 className='mx-3 max-w-xs sm:max-w-2xl text-muted-foreground'>{event.shortDescription}</h2>
 
@@ -40,23 +40,12 @@ function SIHHome() {
 
 
         {/* content section */}
-        <div className='flex justify-center items-center gap-5 pt-14 animate-[fadeIn_1s_ease-in-out]'>
-          {/* <div className="z-10 animate-[fadeIn_0.8s_ease-in-out] p-6 rounded-xl bg-primary/10 backdrop-blur-xs border border-white/10 hover:-translate-y-1 hover:scale-[1.02]
-                transition-all duration-300 ease-in-out hover:shadow-[0_0_30px_rgba(32,178,166,0.2)]">
-                <h3 className="text-xl font-semibold mb-2 text-primary">Register Your Team</h3>
-                <p className="text-muted-foreground">
-                Already have a team? Submit your team's details and get ready for the internal hackathon.
-                </p>
-                <p className='text-muted-foreground'>NOTE: Incomplete teams can also register. Your team will be eligible to participate once the required team size is completed. Other students can send requests to join your team. </p>
-                <div className='flex justify-end items-center mt-3'>
-                  <button className='bg-primary rounded-xl px-5 py-2.5 cursor-pointer  hover:bg-primary2 hover:scale-105 active:scale-95 duration-300'>
-                    Register Your Team →
-                  </button>
-                  </div>
-              </div> */}
+        <div className='flex flex-col md:flex-row justify-evenly items-center gap-5 pt-14 animate-[fadeIn_1s_ease-in-out] '>
+
           <div
             className="
-            max-w-3/4
+            md:min-h-120
+            md:max-w-1/2
     group
     relative
     z-10
@@ -105,19 +94,20 @@ function SIHHome() {
             </div>
 
             {/* CTA */}
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6">
               <Link
               to="/sih/teams"
               className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-primary bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
             >
-              Explore Teams
+              Explore Teams →
             </Link>
             </div>
           </div>
 
           <div
             className="
-            max-w-3/4
+            md:min-h-120
+            md:max-w-1/2
     group
     relative
     z-10
@@ -145,31 +135,30 @@ function SIHHome() {
 
             {/* Content */}
             <h3 className="text-2xl font-bold text-white">
-              Register as an Individual
+              Participants List
             </h3>
 
             <p className="mt-3 text-sm sm:text-base leading-relaxed text-white/70">
-              Don't have a team yet? Register individually and connect with other
-              students looking for teammates.
+              Already have a team but need more members? Browse registered participants and find the right teammates for your team.
             </p>
 
             {/* Important Note */}
             <div className="mt-5 rounded-xl border border-primary/15 bg-primary/5 p-4">
               <p className="text-xs sm:text-sm leading-relaxed text-white/55">
                 <span className="font-semibold text-primary">
-                  What happens next:
+                  Important:
                 </span>{" "}
-                Once you register, your profile will be listed immediately so teams can find you based on your skills, interests, and preferred role. You can also browse existing teams and send requests to join teams you're interested in, subject to the team leader's approval.
+                Registered students will be listed as available participants, allowing team leaders to send invitation requests asking whether they would like to join their teams.
               </p>
             </div>
 
             {/* CTA */}
             <div className="mt-6 flex justify-end">
               <Link
-              to="/sih/signup"
+              to="/sih/participants"
               className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-primary bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
             >
-                Register as a participant
+                Explore Participants →
             </Link>
             </div>
           </div>
