@@ -2,6 +2,7 @@ import Participant from "../models/Participant.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { uploadProfileImageBuffer, deleteProfileImage } from "../utils/cloudinary.js";
 
 const createParticipant = asyncHandler(async(req,res)=>{
     const {
@@ -27,6 +28,11 @@ const createParticipant = asyncHandler(async(req,res)=>{
     throw new ApiError(400, "All required fields must be provided");
   }
 
+  // Profile picture is required, same as the SIH signup flow.
+  if (!req.file) {
+    throw new ApiError(400, "Profile picture is required");
+  }
+
 
   const existingParticipant = await Participant.findOne({ email });
 
@@ -36,16 +42,38 @@ const createParticipant = asyncHandler(async(req,res)=>{
       "Participant with this email already exists"
     );
   }
-  const participant = await Participant.create({
-    name,
-    email,
-    phone,
-    gender,
-    department,
-    branch,
-    year,
-    skills: skills || [],
-  });
+
+  let uploadedImage;
+
+  try {
+    uploadedImage = await uploadProfileImageBuffer(
+      req.file.buffer,
+      { publicIdPrefix: email.trim().toLowerCase() }
+    );
+  } catch (error) {
+    console.error("Cloudinary upload failed (createParticipant):", error);
+    throw new ApiError(500, "Failed to upload profile picture");
+  }
+
+  let participant;
+
+  try {
+    participant = await Participant.create({
+      name,
+      email,
+      phone,
+      gender,
+      department,
+      branch,
+      year,
+      skills: skills || [],
+      profileImage: uploadedImage.secure_url,
+      profileImagePublicId: uploadedImage.public_id,
+    });
+  } catch (error) {
+    await deleteProfileImage(uploadedImage.public_id);
+    throw error;
+  }
 
   return res.status(201).json(
     new ApiResponse(

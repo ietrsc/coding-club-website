@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useSihAuth } from "../context/SihAuthContext";
+import ParticipantAvatar from "./ParticipantAvatar";
 
 function Navbar() {
   const location = useLocation();
@@ -211,7 +212,14 @@ function Navbar() {
                   </span>
                 )}
               </Link>
-              <span className="text-sm text-muted-foreground">
+              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                <ParticipantAvatar
+                  src={user?.participantId?.profileImage}
+                  name={user?.participantId?.name}
+                  size="h-7 w-7"
+                  className="rounded-full bg-primary/10"
+                  textClassName="text-xs font-semibold text-primary"
+                />
                 {user?.participantId?.name || "Participant"}
               </span>
 
@@ -320,7 +328,14 @@ function Navbar() {
 
         {isAuthenticated ? (
           <div className="flex justify-evenly items-center gap-3">
-            <span className="text-sm text-foreground">
+            <span className="flex items-center gap-2 text-sm text-foreground">
+              <ParticipantAvatar
+                src={user?.participantId?.profileImage}
+                name={user?.participantId?.name}
+                size="h-7 w-7"
+                className="rounded-full bg-primary/10"
+                textClassName="text-xs font-semibold text-primary"
+              />
               {user?.participantId?.name || "Participant"}
             </span>
 

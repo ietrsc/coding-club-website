@@ -4,17 +4,42 @@ import { updateTeamEligibility } from "../utils/teamEligibility.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { uploadProfileImageBuffer, deleteProfileImage } from "../utils/cloudinary.js";
 
 
 // ==========================================
 // CREATE TEAM
 // ==========================================
+//
+// This route is multipart/form-data (not JSON) because the
+// leader has to attach a profile picture per member. The
+// frontend sends:
+//   - teamName        (text field)
+//   - members         (text field, JSON.stringify'd array)
+//   - memberImage_0, memberImage_1, ...  (one file per
+//     entry in `members`, matched by array index)
+//
+// upload.any() is used on the route because the number of
+// member files is variable (0-5), so fixed upload.fields()
+// names aren't a good fit.
 
 const createTeam = asyncHandler(async (req, res) => {
-  const {
-    teamName,
-    members = [],
-  } = req.body;
+  const { teamName } = req.body;
+
+  let members = [];
+
+  if (req.body.members) {
+    try {
+      members = JSON.parse(req.body.members);
+    } catch (error) {
+      throw new ApiError(
+        400,
+        "Members must be valid JSON"
+      );
+    }
+  }
+
+  const memberFiles = req.files || [];
 
   // ==========================================
   // GET AUTHENTICATED PARTICIPANT
@@ -81,7 +106,7 @@ const createTeam = asyncHandler(async (req, res) => {
   // VALIDATE TEAM MEMBERS
   // ==========================================
 
-  for (const member of members) {
+  for (const [index, member] of members.entries()) {
     const requiredMemberFields = [
       "name",
       "email",
@@ -103,6 +128,24 @@ const createTeam = asyncHandler(async (req, res) => {
           `Member ${field} is required`
         );
       }
+    }
+
+    // ==========================================
+    // EDGE CASE: leader must upload a profile
+    // picture for every member they add — members
+    // don't have their own account yet to upload
+    // one themselves.
+    // ==========================================
+
+    const memberFile = memberFiles.find(
+      (file) => file.fieldname === `memberImage_${index}`
+    );
+
+    if (!memberFile) {
+      throw new ApiError(
+        400,
+        `Profile picture is required for member "${member.name}"`
+      );
     }
 
     const email = member.email
@@ -149,9 +192,24 @@ const createTeam = asyncHandler(async (req, res) => {
   // ==========================================
 
   const createdMembers = [];
+  const uploadedPublicIds = [];
 
   try {
-    for (const member of members) {
+    for (const [index, member] of members.entries()) {
+      const memberFile = memberFiles.find(
+        (file) => file.fieldname === `memberImage_${index}`
+      );
+
+      // Upload this member's picture to Cloudinary.
+      // (memberFile is guaranteed to exist — checked in the
+      // validation loop above.)
+      const uploadedImage = await uploadProfileImageBuffer(
+        memberFile.buffer,
+        { publicIdPrefix: member.email.trim().toLowerCase() }
+      );
+
+      uploadedPublicIds.push(uploadedImage.public_id);
+
       const participant = await Participant.create({
         name: member.name.trim(),
         email: member.email.trim().toLowerCase(),
@@ -161,6 +219,8 @@ const createTeam = asyncHandler(async (req, res) => {
         branch: member.branch.trim(),
         year: member.year,
         skills: member.skills || [],
+        profileImage: uploadedImage.secure_url,
+        profileImagePublicId: uploadedImage.public_id,
       });
 
       createdMembers.push(participant);
@@ -222,11 +282,11 @@ const createTeam = asyncHandler(async (req, res) => {
     )
       .populate(
         "leaderId",
-        "name email phone gender department branch year skills"
+        "name email phone gender department branch year skills profileImage"
       )
       .populate(
         "members",
-        "name email phone gender department branch year skills"
+        "name email phone gender department branch year skills profileImage"
       );
 
     return res.status(201).json(
@@ -238,6 +298,8 @@ const createTeam = asyncHandler(async (req, res) => {
     );
 
   } catch (error) {
+    console.error("Team creation failed, rolling back:", error);
+
     // ==========================================
     // CLEANUP CREATED MEMBERS
     // ==========================================
@@ -249,6 +311,19 @@ const createTeam = asyncHandler(async (req, res) => {
         ),
       },
     });
+
+    // ==========================================
+    // CLEANUP UPLOADED IMAGES
+    // ==========================================
+    // Don't leave orphaned Cloudinary assets behind for
+    // members whose Participant record didn't make it
+    // (e.g. team creation failed partway through).
+
+    await Promise.all(
+      uploadedPublicIds.map((publicId) =>
+        deleteProfileImage(publicId)
+      )
+    );
 
     throw error;
   }
@@ -263,11 +338,11 @@ const getAllTeams = asyncHandler(async (req, res) => {
   const teams = await Team.find()
     .populate(
       "leaderId",
-      "name email phone gender department branch year skills"
+      "name email phone gender department branch year skills profileImage"
     )
     .populate(
       "members",
-      "name email phone gender department branch year skills"
+      "name email phone gender department branch year skills profileImage"
     );
 
   return res.status(200).json(
@@ -290,11 +365,11 @@ const getTeam = asyncHandler(async (req, res) => {
   const team = await Team.findById(teamId)
     .populate(
       "leaderId",
-      "name email phone gender department branch year skills"
+      "name email phone gender department branch year skills profileImage"
     )
     .populate(
       "members",
-      "name email phone gender department branch year skills"
+      "name email phone gender department branch year skills profileImage"
     );
 
   if (!team) {

@@ -185,7 +185,7 @@ const getMyTeamInvitations = asyncHandler(async (req, res) => {
       path: "teamId",
       populate: {
         path: "leaderId",
-        select: "name email",
+        select: "name email profileImage",
       },
     });
 

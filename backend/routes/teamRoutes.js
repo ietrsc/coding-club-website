@@ -15,9 +15,15 @@ import {
 } from "../controllers/request.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { teamLeaderMiddleware } from "../middlewares/teamLeader.middleware.js";
+import upload from "../middlewares/multer.middleware.js";
 const router = express.Router();
 
-router.post("/", authMiddleware, createTeam);
+router.post(
+  "/",
+  authMiddleware,
+  upload.any(),
+  createTeam
+);
 router.get("/", getAllTeams);
 router.get("/:teamId", getTeam);
 

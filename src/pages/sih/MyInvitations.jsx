@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, Inbox, X } from "lucide-react";
 import GridAnimation from "../../components/GridAnimation";
+import ParticipantAvatar from "../../components/ParticipantAvatar";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -434,16 +435,28 @@ function MyInvitations() {
                       Invited by
                     </p>
 
-                    <p className="mt-2 text-lg font-semibold text-white">
-                      {invitation.teamId?.leaderId?.name ||
-                        "Unknown"}
-                    </p>
+                    <div className="mt-2 flex items-center gap-3">
+                      <ParticipantAvatar
+                        src={invitation.teamId?.leaderId?.profileImage}
+                        name={invitation.teamId?.leaderId?.name}
+                        size="h-10 w-10"
+                        className="rounded-full bg-primary/10"
+                        textClassName="text-sm font-semibold text-primary"
+                      />
 
-                    {invitation.teamId?.leaderId?.email && (
-                      <p className="mt-1 truncate text-sm text-white/45">
-                        {invitation.teamId.leaderId.email}
-                      </p>
-                    )}
+                      <div className="min-w-0">
+                        <p className="truncate text-lg font-semibold text-white">
+                          {invitation.teamId?.leaderId?.name ||
+                            "Unknown"}
+                        </p>
+
+                        {invitation.teamId?.leaderId?.email && (
+                          <p className="truncate text-sm text-white/45">
+                            {invitation.teamId.leaderId.email}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Actions */}

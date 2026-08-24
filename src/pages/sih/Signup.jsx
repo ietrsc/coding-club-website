@@ -20,6 +20,9 @@ function Signup() {
     skills: "",
   });
 
+  const [profileImage, setProfileImage] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -33,38 +36,61 @@ function Signup() {
     }));
   };
 
+  const handleProfileImageChange = (e) => {
+    const file = e.target.files?.[0] || null;
+
+    setProfileImage(file);
+
+    if (file) {
+      setProfileImagePreview(URL.createObjectURL(file));
+    } else {
+      setProfileImagePreview("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!profileImage) {
+      setError("Profile picture is required");
+      return;
+    }
 
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
+      const payload = new FormData();
+
+      payload.append("name", formData.name.trim());
+      payload.append("email", formData.email.trim().toLowerCase());
+      payload.append("password", formData.password);
+      payload.append("phone", formData.phone.trim());
+      payload.append("gender", formData.gender);
+      payload.append("department", formData.department.trim());
+      payload.append("branch", formData.branch.trim());
+      payload.append("year", Number(formData.year));
+
+      const skills = formData.skills
+        ? formData.skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean)
+        : [];
+
+      skills.forEach((skill) => payload.append("skills[]", skill));
+
+      payload.append("profileImage", profileImage);
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/auth/signup`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          // No Content-Type header — the browser sets the
+          // multipart boundary automatically for FormData.
           credentials: "include",
-          body: JSON.stringify({
-            name: formData.name.trim(),
-            email: formData.email.trim().toLowerCase(),
-            password: formData.password,
-            phone: formData.phone.trim(),
-            gender: formData.gender,
-            department: formData.department.trim(),
-            branch: formData.branch.trim(),
-            year: Number(formData.year),
-            skills: formData.skills
-              ? formData.skills
-                .split(",")
-                .map((skill) => skill.trim())
-                .filter(Boolean)
-              : [],
-          }),
+          body: payload,
         }
       );
 
@@ -536,12 +562,91 @@ function Signup() {
               </section>
 
               {/* ================================
+        PROFILE PICTURE
+    ================================= */}
+              <section className="mb-10">
+                <div className="mb-5 flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10">
+                    <span className="text-sm font-bold text-primary">03</span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-bold text-white">
+                      Profile Picture
+                    </h3>
+
+                    <p className="text-sm text-white/40">
+                      Required — used on your participant profile and team roster.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-5">
+                  <div
+                    className="
+              flex
+              h-20
+              w-20
+              shrink-0
+              items-center
+              justify-center
+              overflow-hidden
+              rounded-full
+              border border-white/10
+              bg-black/20
+              text-xs
+              text-white/30
+            "
+                  >
+                    {profileImagePreview ? (
+                      <img
+                        src={profileImagePreview}
+                        alt="Profile preview"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      "No photo"
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfileImageChange}
+                      required
+                      className="
+              block
+              w-full
+              text-sm
+              text-white/70
+              file:mr-4
+              file:rounded-xl
+              file:border-0
+              file:bg-primary/15
+              file:px-4
+              file:py-2
+              file:text-sm
+              file:font-medium
+              file:text-primary
+              hover:file:bg-primary/25
+            "
+                    />
+
+                    <p className="mt-2 text-xs text-white/35">
+                      JPG or PNG, up to 5MB.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* ================================
         SKILLS
     ================================= */}
               <section className="mb-8">
                 <div className="mb-5 flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10">
-                    <span className="text-sm font-bold text-primary">03</span>
+                    <span className="text-sm font-bold text-primary">04</span>
                   </div>
 
                   <div>

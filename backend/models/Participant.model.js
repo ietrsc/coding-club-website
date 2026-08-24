@@ -60,6 +60,15 @@ const participantSchema = new mongoose.Schema(
       ref: "Team",
       default: null,
     },
+    profileImage: {
+      type: String,
+      required: true,
+    },
+
+    profileImagePublicId: {
+      type: String,
+      required: true,
+    },
     
   },
   {

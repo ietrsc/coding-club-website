@@ -7,6 +7,7 @@ import Participant from "../models/Participant.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { uploadProfileImageBuffer, deleteProfileImage } from "../utils/cloudinary.js";
 
 
 // ==========================================
@@ -71,6 +72,17 @@ const signup = asyncHandler(async (req, res) => {
     }
   }
 
+  // ------------------------------------------
+  // Profile picture is required
+  // ------------------------------------------
+
+  if (!req.file) {
+    throw new ApiError(
+      400,
+      "Profile picture is required"
+    );
+  }
+
   if (password.length < 6) {
     throw new ApiError(
       400,
@@ -112,20 +124,68 @@ const signup = asyncHandler(async (req, res) => {
   }
 
   // ------------------------------------------
+  // Upload profile picture
+  // ------------------------------------------
+
+  let uploadedImage;
+
+  try {
+    uploadedImage = await uploadProfileImageBuffer(
+      req.file.buffer,
+      { publicIdPrefix: normalizedEmail }
+    );
+  } catch (error) {
+    // Log the real Cloudinary error server-side — the
+    // response only gets a generic message so we don't leak
+    // internals, but you need the real reason in the logs.
+    console.error("Cloudinary upload failed (signup):", error);
+
+    throw new ApiError(
+      500,
+      "Failed to upload profile picture"
+    );
+  }
+
+  // ------------------------------------------
   // Create Participant
   // ------------------------------------------
 
   if (!participant) {
-    participant = await Participant.create({
-      name: name.trim(),
-      email: normalizedEmail,
-      phone: phone.trim(),
-      gender,
-      department: department.trim(),
-      branch: branch.trim(),
-      year,
-      skills,
-    });
+    try {
+      participant = await Participant.create({
+        name: name.trim(),
+        email: normalizedEmail,
+        phone: phone.trim(),
+        gender,
+        department: department.trim(),
+        branch: branch.trim(),
+        year,
+        skills,
+        profileImage: uploadedImage.secure_url,
+        profileImagePublicId: uploadedImage.public_id,
+      });
+    } catch (error) {
+      // Participant creation failed — don't leave an
+      // orphaned image sitting in Cloudinary.
+      await deleteProfileImage(uploadedImage.public_id);
+      throw error;
+    }
+  } else {
+    // ------------------------------------------
+    // Edge case: this person was already added as a
+    // bare Participant by a team leader (with a photo
+    // the LEADER uploaded on their behalf). They're now
+    // signing up for their own account, so their own
+    // photo replaces the leader-supplied one.
+    // ------------------------------------------
+
+    const oldPublicId = participant.profileImagePublicId;
+
+    participant.profileImage = uploadedImage.secure_url;
+    participant.profileImagePublicId = uploadedImage.public_id;
+
+    await participant.save();
+    await deleteProfileImage(oldPublicId);
   }
 
   // ------------------------------------------
@@ -151,6 +211,10 @@ const signup = asyncHandler(async (req, res) => {
     // If user creation fails, remove the
     // participant only if we created it here.
     if (participant && !participant.userId) {
+      await deleteProfileImage(
+        participant.profileImagePublicId
+      );
+
       await Participant.findByIdAndDelete(
         participant._id
       );

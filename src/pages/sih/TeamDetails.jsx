@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
 import GridAnimation from "../../components/GridAnimation";
+import ParticipantAvatar from "../../components/ParticipantAvatar";
 
 
 function TeamDetails() {
@@ -682,25 +683,13 @@ function TeamDetails() {
           >
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
 
-              <div
-                className="
-                flex
-                h-16
-                w-16
-                shrink-0
-                items-center
-                justify-center
-                rounded-2xl
-                border border-primary/30
-                bg-primary/10
-                text-2xl
-                font-bold
-                text-primary
-                shadow-[0_0_20px_rgba(32,178,166,0.12)]
-              "
-              >
-                {leader?.name?.charAt(0)?.toUpperCase()}
-              </div>
+              <ParticipantAvatar
+                src={leader?.profileImage}
+                name={leader?.name}
+                size="h-16 w-16"
+                className="rounded-2xl border border-primary/30 bg-primary/10 shadow-[0_0_20px_rgba(32,178,166,0.12)]"
+                textClassName="text-2xl font-bold text-primary"
+              />
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -788,23 +777,13 @@ function TeamDetails() {
 
                   <div className="flex gap-4">
 
-                    <div
-                      className="
-                      flex
-                      h-12
-                      w-12
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-xl
-                      border border-white/10
-                      bg-black/20
-                      font-semibold
-                      text-primary
-                    "
-                    >
-                      {member.name?.charAt(0)?.toUpperCase()}
-                    </div>
+                    <ParticipantAvatar
+                      src={member.profileImage}
+                      name={member.name}
+                      size="h-12 w-12"
+                      className="rounded-xl border border-white/10 bg-black/20"
+                      textClassName="font-semibold text-primary"
+                    />
 
                     <div className="min-w-0 flex-1">
 
@@ -967,23 +946,13 @@ function TeamDetails() {
 
                         <div className="flex min-w-0 flex-1 gap-4">
 
-                          <div
-                            className="
-                            flex
-                            h-12
-                            w-12
-                            shrink-0
-                            items-center
-                            justify-center
-                            rounded-xl
-                            bg-primary/10
-                            text-primary
-                          "
-                          >
-                            {participant?.name
-                              ?.charAt(0)
-                              ?.toUpperCase()}
-                          </div>
+                          <ParticipantAvatar
+                            src={participant?.profileImage}
+                            name={participant?.name}
+                            size="h-12 w-12"
+                            className="rounded-xl bg-primary/10"
+                            textClassName="text-primary"
+                          />
 
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">

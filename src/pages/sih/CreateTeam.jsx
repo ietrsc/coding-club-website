@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
+import ParticipantAvatar from "../../components/ParticipantAvatar";
 
 const emptyPerson = {
   name: "",
@@ -25,6 +26,13 @@ function CreateTeam() {
   const [teamName, setTeamName] = useState("");
 
   const [members, setMembers] = useState([]);
+
+  // One File (or null) per entry in `members`, same index —
+  // the leader has to supply a photo for each member they add,
+  // since those members don't have an account yet to upload
+  // their own.
+  const [memberImages, setMemberImages] = useState([]);
+  const [memberImagePreviews, setMemberImagePreviews] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -76,6 +84,9 @@ function CreateTeam() {
         ...emptyPerson,
       },
     ]);
+
+    setMemberImages((prev) => [...prev, null]);
+    setMemberImagePreviews((prev) => [...prev, ""]);
   };
 
   // ==========================================
@@ -86,6 +97,36 @@ function CreateTeam() {
     setMembers((prev) =>
       prev.filter((_, i) => i !== index)
     );
+
+    setMemberImages((prev) =>
+      prev.filter((_, i) => i !== index)
+    );
+
+    setMemberImagePreviews((prev) =>
+      prev.filter((_, i) => i !== index)
+    );
+  };
+
+  // ==========================================
+  // MEMBER PROFILE PICTURE CHANGE
+  // ==========================================
+
+  const handleMemberImageChange = (index, e) => {
+    const file = e.target.files?.[0] || null;
+
+    setMemberImages((prev) =>
+      prev.map((img, i) => (i === index ? file : img))
+    );
+
+    setMemberImagePreviews((prev) =>
+      prev.map((preview, i) =>
+        i === index
+          ? file
+            ? URL.createObjectURL(file)
+            : ""
+          : preview
+      )
+    );
   };
 
   // ==========================================
@@ -94,10 +135,45 @@ function CreateTeam() {
 
   const renderPersonFields = (
     person,
-    handleChange
+    handleChange,
+    imagePreview,
+    onImageChange
   ) => {
     return (
       <div className="grid gap-5 sm:grid-cols-2">
+
+        {/* Profile Picture */}
+        <div className="sm:col-span-2">
+          <label className="mb-2 block text-sm font-medium">
+            Profile Picture <span className="text-red-500">*</span>
+          </label>
+
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-background/50 text-[10px] text-muted-foreground">
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Member preview"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                "No photo"
+              )}
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={onImageChange}
+              required
+              className="flex-1 text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-primary/15 file:px-3 file:py-2 file:text-xs file:font-medium file:text-primary hover:file:bg-primary/25"
+            />
+          </div>
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            You're uploading this on the member's behalf — they can update it once they sign up.
+          </p>
+        </div>
 
         {/* Name */}
         <div>
@@ -281,38 +357,60 @@ function CreateTeam() {
       return;
     }
 
+    // Every added member needs a profile picture — the
+    // leader supplies it since the member has no account yet.
+    const missingImageIndex = members.findIndex(
+      (_, index) => !memberImages[index]
+    );
+
+    if (missingImageIndex !== -1) {
+      setError(
+        `Please upload a profile picture for Member ${missingImageIndex + 2}.`
+      );
+      return;
+    }
+
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
+      const payload = new FormData();
+
+      payload.append("teamName", teamName.trim());
+
+      payload.append(
+        "members",
+        JSON.stringify(
+          members.map((member) => ({
+            ...member,
+
+            year: Number(member.year),
+
+            skills: member.skills
+              ? member.skills
+                  .split(",")
+                  .map((skill) => skill.trim())
+                  .filter(Boolean)
+              : [],
+          }))
+        )
+      );
+
+      memberImages.forEach((file, index) => {
+        payload.append(`memberImage_${index}`, file);
+      });
+
       const response = await fetch(
        `${import.meta.env.VITE_API_URL}/api/teams`,
         {
           method: "POST",
 
-          headers: {
-            "Content-Type": "application/json",
-          },
-
+          // No Content-Type header — the browser sets the
+          // multipart boundary automatically for FormData.
           credentials: "include",
 
-          body: JSON.stringify({
-            teamName: teamName.trim(),
-
-            members: members.map((member) => ({
-              ...member,
-
-              year: Number(member.year),
-
-              skills: member.skills
-                ? member.skills
-                    .split(",")
-                    .map((skill) => skill.trim())
-                    .filter(Boolean)
-                : [],
-            })),
-          }),
+          body: payload,
         }
       );
 
@@ -541,11 +639,13 @@ setTimeout(() => {
 
               <div className="flex items-center gap-3">
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                  {user?.participantId?.name
-                    ?.charAt(0)
-                    ?.toUpperCase() || "U"}
-                </div>
+                <ParticipantAvatar
+                  src={user?.participantId?.profileImage}
+                  name={user?.participantId?.name}
+                  size="h-10 w-10"
+                  className="rounded-full bg-primary/10"
+                  textClassName="font-semibold text-primary"
+                />
 
                 <div>
                   <p className="text-sm font-medium">
@@ -638,6 +738,12 @@ setTimeout(() => {
                       member,
                       (e) =>
                         handleMemberChange(
+                          index,
+                          e
+                        ),
+                      memberImagePreviews[index],
+                      (e) =>
+                        handleMemberImageChange(
                           index,
                           e
                         )

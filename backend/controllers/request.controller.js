@@ -147,7 +147,7 @@ const getTeamJoinRequests = asyncHandler(
       status: "pending",
     }).populate(
       "participantId",
-      "name email phone gender department branch year skills"
+      "name email phone gender department branch year skills profileImage"
     );
 
     return res.status(200).json(

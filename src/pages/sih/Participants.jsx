@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
 import GridAnimation from "../../components/GridAnimation";
+import ParticipantAvatar from "../../components/ParticipantAvatar";
 import { events } from "../../data/event";
 
 
@@ -245,18 +246,28 @@ const teamLeaderId =
 
                 {/* Header */}
                 <div className="relative flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                      Participant
-                    </span>
+                  <div className="flex min-w-0 items-start gap-3">
+                    <ParticipantAvatar
+                      src={participant.profileImage}
+                      name={participant.name}
+                      size="h-12 w-12"
+                      className="rounded-xl border border-primary/20 bg-primary/10"
+                      textClassName="font-semibold text-primary"
+                    />
 
-                    <h2 className="mt-1 truncate text-xl font-bold text-white">
-                      {participant.name}
-                    </h2>
+                    <div className="min-w-0">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                        Participant
+                      </span>
 
-                    <p className="mt-1 truncate text-sm text-white/45">
-                      {participant.college}
-                    </p>
+                      <h2 className="mt-1 truncate text-xl font-bold text-white">
+                        {participant.name}
+                      </h2>
+
+                      <p className="mt-1 truncate text-sm text-white/45">
+                        {participant.college}
+                      </p>
+                    </div>
                   </div>
 
                   {participant.gender && (
