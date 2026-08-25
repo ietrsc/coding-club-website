@@ -20,8 +20,8 @@ export const events = [
     image: "/events/sih/sih2026.png",
     thumbnail: "/events/sih/sih2026thumbnail.png",
     registrationLink: "https://docs.google.com/forms/d/e/1FAIpQLSf8b8Gs_awZXJLnx7i6waz_Zzl_5i3PTY1Y6TTEUjFRny8jWQ/viewform?usp=header",
-    psLink: "https://www.sih.gov.in/sih2025PS",
-    rulebookLink: "https://www.sih.gov.in/letters/2026/SIH%202026%20Guidelines.pdf",
+    psLink: "https://www.sih.gov.in/sih2026PS",
+    rulebookLink: "/docs/SIH_2026-InternalHackathon_Rulebook.pdf",
     gallery: "",
   },
   {
