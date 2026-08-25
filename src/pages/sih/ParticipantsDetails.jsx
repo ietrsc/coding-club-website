@@ -14,6 +14,19 @@ function ParticipantsDetails() {
     isAuthenticated,
   } = useSihAuth();
 
+  const userParticipantId =
+    user?.participantId?._id ||
+    user?.participantId;
+
+  const teamLeaderId =
+    user?.participantId?.teamId?.leaderId?._id ||
+    user?.participantId?.teamId?.leaderId;
+
+  const isTeamLeader =
+    Boolean(userParticipantId) &&
+    Boolean(teamLeaderId) &&
+    userParticipantId.toString() === teamLeaderId.toString();
+
   const [participant, setParticipant] = useState(null);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
 
@@ -77,55 +90,55 @@ function ParticipantsDetails() {
   // ==========================================
 
   const handleSendInvitation = async () => {
-  if (!isAuthenticated) {
-    navigate("/sih/login");
-    return;
-  }
-
-  if (!participant?._id) return;
-
-  try {
-    setSendingInvitation(true);
-    setInviteMessage("");
-    setInviteError("");
-
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/invitations/invite`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          participantId: participant._id,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to send invitation"
-      );
+    if (!isAuthenticated) {
+      navigate("/sih/login");
+      return;
     }
 
-    setInviteMessage(
-      data.message || "Invitation sent successfully!"
-    );
+    if (!participant?._id) return;
 
-    window.dispatchEvent(
-      new CustomEvent("sih-invitations-changed")
-    );
-  } catch (err) {
-    setInviteError(
-      err.message || "Failed to send invitation"
-    );
-  } finally {
-    setSendingInvitation(false);
-  }
-};
+    try {
+      setSendingInvitation(true);
+      setInviteMessage("");
+      setInviteError("");
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/invitations/invite`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            participantId: participant._id,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to send invitation"
+        );
+      }
+
+      setInviteMessage(
+        data.message || "Invitation sent successfully!"
+      );
+
+      window.dispatchEvent(
+        new CustomEvent("sih-invitations-changed")
+      );
+    } catch (err) {
+      setInviteError(
+        err.message || "Failed to send invitation"
+      );
+    } finally {
+      setSendingInvitation(false);
+    }
+  };
 
   // ==========================================
   // LOADING
@@ -637,7 +650,7 @@ function ParticipantsDetails() {
               text-red-400
             "
           >
-            { inviteError || "Something went wrong."}
+            {inviteError || "Something went wrong."}
           </div>
         )}
 
@@ -646,14 +659,14 @@ function ParticipantsDetails() {
             CTA
         ========================================== */}
 
-        {isAuthenticated && (
+        {isAuthenticated && isTeamLeader && (
           <section className="mt-10">
 
             <button
               type="button"
               onClick={handleSendInvitation}
               disabled={sendingInvitation}
-              className="
+              className={`
                 w-full
                 rounded-2xl
                 bg-primary
@@ -672,7 +685,7 @@ function ParticipantsDetails() {
                 disabled:cursor-not-allowed
                 disabled:opacity-50
                 cursor-pointer
-              "
+              `}
             >
               {sendingInvitation
                 ? "Sending Invitation..."
