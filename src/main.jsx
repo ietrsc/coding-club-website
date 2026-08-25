@@ -32,6 +32,7 @@ import Signup from "./pages/sih/Signup.jsx";
 import Login from "./pages/sih/Login.jsx";
 import ProtectedSihRoute from "./components/ProtectedSihRoute.jsx";
 import MyInvitations from "./pages/sih/MyInvitations.jsx";
+import ParticipantsDetails from "./pages/sih/ParticipantsDetails.jsx";
 
 
 const router = createBrowserRouter([
@@ -93,13 +94,13 @@ const router = createBrowserRouter([
       },
 
       {
-  path: "/sih/teams/create",
-  element: (
-    <ProtectedSihRoute>
-      <CreateTeam />
-    </ProtectedSihRoute>
-  ),
-},
+        path: "/sih/teams/create",
+        element: (
+          <ProtectedSihRoute>
+            <CreateTeam />
+          </ProtectedSihRoute>
+        ),
+      },
 
       {
         path: "/sih/teams/:teamId",
@@ -134,13 +135,17 @@ const router = createBrowserRouter([
         ),
       },
       {
-  path: "/sih/invitations",
-  element: (
-    <ProtectedSihRoute>
-      <MyInvitations />
-    </ProtectedSihRoute>
-  ),
-}
+        path: "/sih/invitations",
+        element: (
+          <ProtectedSihRoute>
+            <MyInvitations />
+          </ProtectedSihRoute>
+        ),
+      },
+      {
+        path: "/sih/participants/:participantId",
+        element: <ParticipantsDetails />
+      }
 
 
       // ==========================================

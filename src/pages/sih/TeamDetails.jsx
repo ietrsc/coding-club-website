@@ -977,17 +977,71 @@ function TeamDetails() {
 
                   <div className="flex gap-4">
 
-                    <ParticipantAvatar
-                      src={member.profileImage}
-                      name={member.name}
-                      size="h-14 w-14"
+                    <button type="button"
+                      disabled={!member?.profileImage}
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        if (member?.profileImage) {
+                          setSelectedAvatar({
+                            src: member.profileImage,
+                            name: member.name,
+                          });
+                        }
+                      }}
                       className="
+      group/avatar
+      relative
+      h-20
+      w-20
+      overflow-hidden
+      rounded-full
+      border-2
+      border-primary
+      bg-primary/10
+      shadow-[0_0_25px_rgba(32,178,166,0.2)]
+      transition-all
+      duration-300
+      hover:scale-105
+      hover:shadow-[0_0_35px_rgba(32,178,166,0.35)]
+      disabled:cursor-default
+    ">
+
+                      <ParticipantAvatar
+                        src={member.profileImage}
+                        name={member.name}
+                        size="h-full w-full"
+                        className="
                 rounded-xl
                 border border-white/10
                 bg-black/20
               "
-                      textClassName="font-semibold text-primary"
-                    />
+                        textClassName="font-semibold text-primary"
+                      />
+                      {member.profileImage && (
+                        <span
+                          className="
+                      cursor-pointer
+              absolute
+              inset-0
+              flex
+              items-center
+              justify-center
+              rounded-full
+              bg-black/50
+              text-xs
+              font-semibold
+              text-white
+              opacity-0
+              transition-opacity
+              duration-300
+              hover:opacity-100
+            "
+                        >
+                          View Photo
+                        </span>
+                      )}
+                    </button>
 
                     <div className="min-w-0 flex-1">
 
@@ -1047,6 +1101,7 @@ function TeamDetails() {
                     </div>
 
                   </div>
+
 
                   {/* Leader Controls */}
                   {isTeamLeader && (
@@ -1218,11 +1273,37 @@ function TeamDetails() {
                         <div className="flex gap-2 lg:w-52 lg:flex-col">
                           <button
                             type="button"
+                            onClick={
+                              () => navigate(`/sih/participants/${participant._id}`)
+                            }
+                            className="
+                            flex-1
+                            rounded-xl
+                            border
+                            border-primary
+                            bg-primary/5
+                            px-4
+                            py-2.5
+                            text-sm
+                            font-semibold
+                            text-white
+                            transition-all
+                            duration-300
+                            hover:bg-primary2
+                            disabled:opacity-50
+                            cursor-pointer
+                          "
+                          >
+                            Veiw Details
+                          </button>
+                          <button
+                            type="button"
                             onClick={() =>
                               handleAcceptRequest(request._id)
                             }
                             disabled={isProcessing}
                             className="
+                            cursor-pointer
                             flex-1
                             rounded-xl
                             bg-primary
@@ -1249,6 +1330,7 @@ function TeamDetails() {
                             }
                             disabled={isProcessing}
                             className="
+                            cursor-pointer
                             flex-1
                             rounded-xl
                             border border-red-400/20
@@ -1439,8 +1521,8 @@ function TeamDetails() {
                 src={selectedAvatar.src}
                 alt={selectedAvatar.name}
                 className="
-          max-h-3/4
-          max-w-3/4
+                max-h-[70vh]
+                max-w-[75vw]
           rounded-3xl
           border
           border-primary/30

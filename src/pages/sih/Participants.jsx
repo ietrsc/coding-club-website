@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useSihAuth } from "../../context/SihAuthContext";
+import { Link, useNavigate } from "react-router-dom";
 import GridAnimation from "../../components/GridAnimation";
 import ParticipantAvatar from "../../components/ParticipantAvatar";
 import { events } from "../../data/event";
@@ -10,37 +9,17 @@ function Participants() {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [sendingInvitation, setSendingInvitation] = useState(null);
-  const [inviteMessage, setInviteMessage] = useState("");
-  const [inviteError, setInviteError] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState(null);
 
-  const {
-    user,
-    isAuthenticated,
-    loading: authLoading,
-  } = useSihAuth();
-
-  const userParticipantId =
-    user?.participantId?._id ||
-    user?.participantId;
-
-  const userTeamId =
-    user?.participantId?.teamId?._id ||
-    user?.participantId?.teamId;
+  const navigate = useNavigate();
 
   // user.participantId.teamId is now populated with
   // { _id, teamName, leaderId } by getCurrentUser, so we
   // can tell if the logged-in participant leads their team
   // without a second network request.
-  const teamLeaderId =
-    user?.participantId?.teamId?.leaderId?._id ||
-    user?.participantId?.teamId?.leaderId;
 
-  const isTeamLeader =
-    Boolean(userParticipantId) &&
-    Boolean(teamLeaderId) &&
-    userParticipantId.toString() === teamLeaderId.toString();
+
+
   const fetchParticipants = async () => {
     try {
       setLoading(true);
@@ -64,49 +43,6 @@ function Participants() {
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
-    }
-  };
-  const handleSendInvitation = async (participantId) => {
-    try {
-      setSendingInvitation(participantId);
-      setInviteMessage("");
-      setInviteError("");
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/invitations/invite`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            participantId,
-          }),
-        }
-      );
-
-      const data = await response.json();
-      window.alert(data.message || "Something went wrong")
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to send invitation"
-        );
-      }
-
-      setInviteMessage(
-        data.message || "Invitation sent successfully!"
-      );
-
-
-
-    } catch (error) {
-      setInviteError(
-        error.message || "Failed to send invitation"
-      );
-    } finally {
-      setSendingInvitation(null);
     }
   };
 
@@ -145,18 +81,6 @@ function Participants() {
             creating a team, you can find potential teammates here.</h2>
 
         </div>
-
-        {inviteMessage && (
-          <div className="mx-auto mt-6 max-w-xl rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-center text-sm text-green-600">
-            {inviteMessage}
-          </div>
-        )}
-
-        {inviteError && (
-          <div className="mx-auto mt-6 max-w-xl rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-500">
-            {inviteError}
-          </div>
-        )}
 
         {/* Loading */}
         {loading && (
@@ -379,35 +303,17 @@ function Participants() {
 
                   </div>
 
-                  {/* Skills */}
-                  <div className="mt-1 flex items-end max-w-57.5 flex-wrap justify-center gap-1.5">
-                    <div className={`${ (!isAuthenticated || (isAuthenticated && !isTeamLeader)) && "rounded-xl border border-white/5 bg-black/20 px-4 text-start h-16 w-41"} `}>
-                    {participant.skills?.length > 0 ? (
-                      participant.skills.slice(0, 4).map((skill, index) => (
-                        <span
-                          key={`${participant._id}-${index}`}
-                          className="text-[11px] text-primary/80 "
-                        >
-                          #{skill}{" "}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-white/35">
-                        No skills added
-                      </span>
-                    )}
-                  </div>
-                  </div>
+                  {/* View Details Button */}
 
-                  {/* Invite Button */}
-                  {isAuthenticated && isTeamLeader && (
-                    <button
-                      type="button"
-                      onClick={() => handleSendInvitation(participant._id)}
-                      disabled={sendingInvitation === participant._id}
-                      className={`
+                  <button
+                    type="button"
+                    onClick={
+                      () => navigate(`/sih/participants/${participant._id}`)
+                    }
+                    className={`
+
                       cursor-pointer
-              mt-1
+              mt-3
               w-full
 
               max-w-40
@@ -429,16 +335,15 @@ function Participants() {
               active:scale-[0.98]
               disabled:cursor-not-allowed
               disabled:opacity-50
-              ${sendingInvitation === participant._id
-                        ? "bg-primary"
-                        : "bg-primary/5"}
+            bg-primary/5
             `}
-                    >
-                      {sendingInvitation === participant._id
+                  >
+                    View Details →
+
+                    {/* {sendingInvitation === participant._id
                         ? "Sending Invitation..."
-                        : "Invite to Join Team →"}
-                    </button>
-                  )}
+                        : "Invite to Join Team →"} */}
+                  </button>
                 </div>
 
                 {/* Bottom Accent */}
@@ -512,8 +417,8 @@ function Participants() {
                 src={selectedAvatar.src}
                 alt={selectedAvatar.name}
                 className="
-          max-h-3/4
-          max-w-3/4
+          max-h-[70vh]
+          max-w-[75vw]
           rounded-3xl
           border
           border-primary/30

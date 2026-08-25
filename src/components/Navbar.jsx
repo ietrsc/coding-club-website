@@ -49,6 +49,7 @@ function Navbar() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
   useEffect(() => {
     if (authLoading) return;
 
@@ -58,6 +59,7 @@ function Navbar() {
     }
 
     let cancelled = false;
+
     const fetchInvitationCount = async () => {
       try {
         const response = await fetch(
@@ -84,17 +86,19 @@ function Navbar() {
           "Failed to fetch invitation count:",
           error
         );
-
-        if (!cancelled) {
-          setInvitationCount(0);
-        }
       }
     };
 
+    // Initial fetch
     fetchInvitationCount();
 
-    // Update count immediately when an invitation
-    // is accepted or rejected.
+    // Check for new invitations every 5 seconds
+    const interval = setInterval(
+      fetchInvitationCount,
+      5000
+    );
+
+    // Still keep your local event for instant updates
     window.addEventListener(
       "sih-invitations-changed",
       fetchInvitationCount
@@ -102,6 +106,8 @@ function Navbar() {
 
     return () => {
       cancelled = true;
+
+      clearInterval(interval);
 
       window.removeEventListener(
         "sih-invitations-changed",
@@ -156,8 +162,8 @@ function Navbar() {
             <Link
               to="/"
               className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/"
-                  ? "bg-surface text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-surface"
+                ? "bg-surface text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface"
                 }`}
             >
               Home
@@ -168,8 +174,8 @@ function Navbar() {
             <Link
               to="/events"
               className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/events"
-                  ? "bg-surface text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-surface"
+                ? "bg-surface text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface"
                 }`}
             >
               Events
@@ -180,8 +186,8 @@ function Navbar() {
             <Link
               to="/members"
               className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/members"
-                  ? "bg-surface text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-surface"
+                ? "bg-surface text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface"
                 }`}
             >
               Members
@@ -380,8 +386,8 @@ function Navbar() {
 
       <div
         className={`md:hidden mt-6 mx-4 rounded-xl py-4 flex flex-col items-center justify-center gap-3 transition-all duration-300 ease-in-out ${location.pathname === "/"
-            ? "bg-linear-to-b from-primary/5 via-black/90 to-primary/10"
-            : "bg-background/90"
+          ? "bg-linear-to-b from-primary/5 via-black/90 to-primary/10"
+          : "bg-background/90"
           } ${menuOpen
             ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 -translate-y-4 pointer-events-none"

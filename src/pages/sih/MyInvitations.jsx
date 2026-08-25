@@ -79,8 +79,8 @@ function MyInvitations() {
         )
       );
       window.dispatchEvent(
-  new CustomEvent("sih-invitations-changed")
-);
+        new CustomEvent("sih-invitations-changed")
+      );
 
       setTimeout(() => {
         navigate("/sih/teams");
@@ -126,8 +126,8 @@ function MyInvitations() {
         )
       );
       window.dispatchEvent(
-  new CustomEvent("sih-invitations-changed")
-);
+        new CustomEvent("sih-invitations-changed")
+      );
 
     } catch (error) {
       setError(
@@ -460,64 +460,95 @@ function MyInvitations() {
                   </div>
 
                   {/* Actions */}
-                  <div className="relative mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="relative mt-6 space-y-3">
+
+                    {/* View Team */}
                     <button
                       type="button"
                       onClick={() =>
-                        handleReject(invitation._id)
+                        navigate(`/sih/teams/${invitation.teamId?._id}`)
                       }
-                      disabled={isProcessing}
                       className="
-                        rounded-xl
-                        border border-red-400/20
-                        bg-red-400/5
-                        px-4
-                        py-3
-                        text-sm
-                        font-semibold
-                        text-red-400
-                        transition-all
-                        duration-300
-                        hover:-translate-y-0.5
-                        hover:border-red-400/40
-                        hover:bg-red-400/10
-                        active:scale-[0.98]
-                        disabled:cursor-not-allowed
-                        disabled:opacity-50
-                        cursor-pointer
-                      "
+      w-full
+      rounded-xl
+      border
+      border-primary/25
+      bg-primary/5
+      px-4
+      py-3
+      text-sm
+      font-semibold
+      text-primary
+      transition-all
+      duration-300
+      hover:-translate-y-0.5
+      hover:border-primary/50
+      hover:bg-primary/10
+      active:scale-[0.98]
+      cursor-pointer
+    "
                     >
-                      {isProcessing ? "Processing..." : "Reject"}
+                      View Team →
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleAccept(invitation._id)
-                      }
-                      disabled={isProcessing}
-                      className="
-                        rounded-xl
-                        bg-primary
-                        px-4
-                        py-3
-                        text-sm
-                        font-semibold
-                        text-white
-                        shadow-[0_0_20px_rgba(32,178,166,0.15)]
-                        transition-all
-                        duration-300
-                        hover:-translate-y-0.5
-                        hover:bg-primary2
-                        hover:shadow-[0_0_30px_rgba(32,178,166,0.3)]
-                        active:scale-[0.98]
-                        disabled:cursor-not-allowed
-                        disabled:opacity-50
-                        cursor-pointer
-                      "
-                    >
-                      {isProcessing ? "Processing..." : "Accept →"}
-                    </button>
+                    {/* Reject + Accept */}
+                    <div className="grid grid-cols-2 gap-3">
+
+                      <button
+                        type="button"
+                        onClick={() => handleReject(invitation._id)}
+                        disabled={isProcessing}
+                        className="
+        rounded-xl
+        border border-red-400/20
+        bg-red-400/5
+        px-4
+        py-3
+        text-sm
+        font-semibold
+        text-red-400
+        transition-all
+        duration-300
+        hover:-translate-y-0.5
+        hover:border-red-400/40
+        hover:bg-red-400/10
+        active:scale-[0.98]
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+        cursor-pointer
+      "
+                      >
+                        {isProcessing ? "Processing..." : "Reject"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAccept(invitation._id)}
+                        disabled={isProcessing}
+                        className="
+        rounded-xl
+        bg-primary
+        px-4
+        py-3
+        text-sm
+        font-semibold
+        text-white
+        shadow-[0_0_20px_rgba(32,178,166,0.15)]
+        transition-all
+        duration-300
+        hover:-translate-y-0.5
+        hover:bg-primary2
+        hover:shadow-[0_0_30px_rgba(32,178,166,0.3)]
+        active:scale-[0.98]
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+        cursor-pointer
+      "
+                      >
+                        {isProcessing ? "Processing..." : "Accept →"}
+                      </button>
+
+                    </div>
                   </div>
 
                   {/* Bottom Accent */}
