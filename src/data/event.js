@@ -4,7 +4,7 @@ export const events = [
     slug: "sih-2026",
     title: "Smart India Hackathon 2026 - Internal Hackathon",
     type: "Hackathon",
-    status: "live",
+    status: "upcoming",
     date: " To Be Announced",
     shortDescription:
       "College-level hackathon to select the best teams for Smart India Hackathon 2026.",

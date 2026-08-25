@@ -484,6 +484,7 @@ function MyInvitations() {
                         active:scale-[0.98]
                         disabled:cursor-not-allowed
                         disabled:opacity-50
+                        cursor-pointer
                       "
                     >
                       {isProcessing ? "Processing..." : "Reject"}
@@ -512,6 +513,7 @@ function MyInvitations() {
                         active:scale-[0.98]
                         disabled:cursor-not-allowed
                         disabled:opacity-50
+                        cursor-pointer
                       "
                     >
                       {isProcessing ? "Processing..." : "Accept →"}

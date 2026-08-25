@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
 import GridAnimation from "../../components/GridAnimation";
 import { events } from "../../data/event";
+import ParticipantAvatar from "../../components/ParticipantAvatar";
 
 function Teams() {
 
@@ -362,24 +363,24 @@ function Teams() {
                       <div className="flex min-w-0 items-center gap-4">
 
                         {/* Team Avatar */}
-                        <div
+                        <ParticipantAvatar
+                          src={team.leaderId?.profileImage}
+                          name={team.leaderId?.name}
+                          size="h-14 w-14"
                           className="
-          flex
-          h-14
-          w-14
-          shrink-0
-          items-center
-          justify-center
-          rounded-2xl
-          border border-primary/25
-          bg-primary/10
-          text-xl
-          font-black
-          text-primary
-        "
-                        >
-                          {team.teamName?.charAt(0)?.toUpperCase()}
-                        </div>
+    shrink-0
+    rounded-2xl
+    border
+    border-primary/25
+    bg-primary/10
+    shadow-[0_0_20px_rgba(32,178,166,0.12)]
+  "
+                          textClassName="
+    text-xl
+    font-bold
+    text-primary
+  "
+                        />
 
                         <div className="min-w-0">
                           <p className="text-xs font-semibold uppercase tracking-wider text-primary">
@@ -448,7 +449,7 @@ function Teams() {
                           className="
           h-full
           rounded-full
-          bg-gradient-to-r
+          bg-linear-to-r
           from-primary
           to-teal-300
           shadow-[0_0_12px_rgba(32,178,166,0.45)]
@@ -574,7 +575,7 @@ function Teams() {
                           type="button"
                           onClick={
                             team._id?.toString() == userTeamId?.toString() ? () => navigate(`/sih/teams/${userTeamId}`) :
-                            () => handleRequestClick(team._id)
+                              () => handleRequestClick(team._id)
                           }
                           disabled={isFull}
                           className="
@@ -599,8 +600,8 @@ function Teams() {
         "
                         >
                           {
-                            team._id?.toString() == userTeamId?.toString() ? "View your team →":
-                            isFull ? "Team Full" : "Request to Join →"
+                            team._id?.toString() == userTeamId?.toString() ? "View your team →" :
+                              isFull ? "Team Full" : "Request to Join →"
                           }
                         </button>
                       ) : (

@@ -13,12 +13,14 @@ function Participants() {
   const [sendingInvitation, setSendingInvitation] = useState(null);
   const [inviteMessage, setInviteMessage] = useState("");
   const [inviteError, setInviteError] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
 
   const {
     user,
     isAuthenticated,
     loading: authLoading,
   } = useSihAuth();
+
   const userParticipantId =
     user?.participantId?._id ||
     user?.participantId;
@@ -27,13 +29,13 @@ function Participants() {
     user?.participantId?.teamId?._id ||
     user?.participantId?.teamId;
 
-// user.participantId.teamId is now populated with
-// { _id, teamName, leaderId } by getCurrentUser, so we
-// can tell if the logged-in participant leads their team
-// without a second network request.
-const teamLeaderId =
-  user?.participantId?.teamId?.leaderId?._id ||
-  user?.participantId?.teamId?.leaderId;
+  // user.participantId.teamId is now populated with
+  // { _id, teamName, leaderId } by getCurrentUser, so we
+  // can tell if the logged-in participant leads their team
+  // without a second network request.
+  const teamLeaderId =
+    user?.participantId?.teamId?.leaderId?._id ||
+    user?.participantId?.teamId?.leaderId;
 
   const isTeamLeader =
     Boolean(userParticipantId) &&
@@ -85,6 +87,7 @@ const teamLeaderId =
       );
 
       const data = await response.json();
+      window.alert(data.message || "Something went wrong")
 
       if (!response.ok) {
         throw new Error(
@@ -95,6 +98,8 @@ const teamLeaderId =
       setInviteMessage(
         data.message || "Invitation sent successfully!"
       );
+
+
 
     } catch (error) {
       setInviteError(
@@ -112,7 +117,7 @@ const teamLeaderId =
   const event = events.find((e) => e.slug === "sih-2026");
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-28">
 
       <div className="hidden md:block pointer-events-none">
         <GridAnimation />
@@ -210,157 +215,180 @@ const teamLeaderId =
               <div
                 key={participant._id}
                 className="
-      group
-      relative
-      overflow-hidden
-      rounded-3xl
-      border border-primary/20
-      bg-white/5
-      p-6
-      backdrop-blur-md
-      transition-all
-      duration-300
-      hover:-translate-y-2
-      hover:border-primary/40
-      hover:bg-primary/5
-      hover:shadow-[0_0_35px_rgba(32,178,166,0.15)]
-    "
-              >
-                {/* Ambient Glow */}
-                <div
-                  className="
-        pointer-events-none
-        absolute
-        -right-16
-        -top-16
-        h-40
-        w-40
-        rounded-full
-        bg-primary/5
-        blur-3xl
+        animate-[fadeIn_1s_ease-in-out]
+        relative
+        group
+        overflow-hidden
+        h-96
+        w-full
+        max-w-59 sm:max-w-68 max-h-83 sm:max-h-100
+        mx-auto
+        rounded-2xl
+        border
+        border-primary/30
+        bg-primary/10
+        backdrop-blur-md
         transition-all
         duration-300
-        group-hover:bg-primary/10
+        hover:-translate-y-2
+        hover:border-primary/50
+        hover:shadow-[0_0_30px_rgba(32,178,166,0.2)]
+        z-10
+        active:scale-[0.98]
       "
+              >
+
+                {/* Ambient background */}
+                <div
+                  className="
+          absolute
+          -top-20
+          left-1/2
+          -translate-x-1/2
+          h-56
+          w-56
+          rounded-full
+          bg-primary/10
+          blur-3xl
+          transition-all
+          duration-500
+          group-hover:bg-primary/20
+          max-w-59 sm:max-w-68 max-h-83 sm:max-h-96
+        "
                 />
 
-                {/* Header */}
-                <div className="relative flex items-start justify-between gap-4">
-                  <div className="flex min-w-0 items-start gap-3">
-                    <ParticipantAvatar
-                      src={participant.profileImage}
-                      name={participant.name}
-                      size="h-12 w-12"
-                      className="rounded-xl border border-primary/20 bg-primary/10"
-                      textClassName="font-semibold text-primary"
-                    />
+                <img
+                  src="/images/cardBg.png"
+                  alt="bg"
+                  className="absolute inset-0 opacity-90 sm:opacity-70 group-hover:opacity-90 object-contain transition duration-300"
+                />
 
-                    <div className="min-w-0">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                        Participant
-                      </span>
+                {/* Large Profile Avatar */}
+                <button
+                  type="button"
+                  disabled={!participant.profileImage}
+                  onClick={(e) => {
+                    e.stopPropagation();
 
-                      <h2 className="mt-1 truncate text-xl font-bold text-white">
-                        {participant.name}
-                      </h2>
+                    if (participant.profileImage) {
+                      setSelectedAvatar({
+                        src: participant.profileImage,
+                        name: participant.name,
+                      });
+                    }
+                  }}
+                  className="
+          absolute
+          top-8
+          left-1/2
+          -translate-x-1/2
+          z-20
+          h-22
+          w-22
+          md:h-32
+          md:w-32
+          rounded-full
+          border-2
+          border-primary
+          bg-primary/10
+          overflow-hidden
+          shadow-[0_0_25px_rgba(32,178,166,0.2)]
+          transition-all
+          duration-300
+          hover:scale-105
+          hover:shadow-[0_0_35px_rgba(32,178,166,0.35)]
+          disabled:cursor-default
+        "
+                >
+                  <ParticipantAvatar
+                    src={participant.profileImage}
+                    name={participant.name}
+                    size="h-full w-full"
+                    className="rounded-full"
+                    textClassName="text-3xl font-bold text-primary"
+                  />
 
-                      <p className="mt-1 truncate text-sm text-white/45">
-                        {participant.college}
-                      </p>
-                    </div>
-                  </div>
-
-                  {participant.gender && (
+                  {participant.profileImage && (
                     <span
                       className="
-            shrink-0
-            rounded-full
-            border border-primary/20
-            bg-primary/10
-            px-3
-            py-1
-            text-xs
-            font-medium
-            capitalize
-            text-primary
-          "
+                      cursor-pointer
+              absolute
+              inset-0
+              flex
+              items-center
+              justify-center
+              rounded-full
+              bg-black/50
+              text-xs
+              font-semibold
+              text-white
+              opacity-0
+              transition-opacity
+              duration-300
+              hover:opacity-100
+            "
                     >
-                      {participant.gender}
+                      View Photo
                     </span>
                   )}
-                </div>
+                </button>
 
-                {/* Academic Information */}
-                <div className="relative mt-6 grid grid-cols-2 gap-3">
-                  <div
-                    className="
-          rounded-xl
-          border border-white/5
-          bg-black/20
-          p-4
+                {/* Content */}
+                <div
+                  className="
+          relative mt-30 md:mt-42
+          inset-x-0
+          z-10
+          flex
+          flex-col
+          items-center
+          mx-6
+          text-center
+
+          to-transparent
         "
-                  >
-                    <p className="text-xs text-white/40">
-                      Branch
-                    </p>
+                >
 
-                    <p className="mt-1 truncate text-sm font-semibold text-white">
-                      {participant.branch}
-                    </p>
+                  {/* Name */}
+                  <h2 className=" text-xl font-bold text-white">
+                    {participant.name}
+                  </h2>
+
+                  {/* Academic Information */}
+                  <div className="relative mt-1 grid grid-cols-2 gap-3">
+
+                    <div className="rounded-xl border border-white/5 bg-black/20 p-4 text-center">
+                      <p className="text-[10px] uppercase tracking-wider text-white/30">
+                        Branch
+                      </p>
+
+                      <p className="mt-1 truncate text-sm font-semibold text-white">
+                        {participant.branch || "—"}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-white/5 bg-black/20 p-4 text-center">
+                      <p className="text-[10px] uppercase tracking-wider text-white/30">
+                        Year
+                      </p>
+
+                      <p className="mt-1 text-sm font-semibold text-white">
+                        {participant.year || "—"}
+                      </p>
+                    </div>
+
                   </div>
 
-                  <div
-                    className="
-          rounded-xl
-          border border-white/5
-          bg-black/20
-          p-4
-        "
-                  >
-                    <p className="text-xs text-white/40">
-                      Year
-                    </p>
-
-                    <p className="mt-1 text-sm font-semibold text-white">
-                      {participant.year}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Skills */}
-                <div className="relative mt-6">
-                  <div className="mb-3 flex items-center justify-between">
-                    <p className="text-sm font-medium text-white/70">
-                      Skills
-                    </p>
-
-                    {participant.skills?.length > 0 && (
-                      <span className="text-xs text-white/35">
-                        {participant.skills.length} skill
-                        {participant.skills.length !== 1 ? "s" : ""}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
+                  {/* Skills */}
+                  <div className="mt-1 flex items-end max-w-57.5 flex-wrap justify-center gap-1.5">
+                    <div className={`${ (!isAuthenticated || (isAuthenticated && !isTeamLeader)) && "rounded-xl border border-white/5 bg-black/20 px-4 text-start h-16 w-41"} `}>
                     {participant.skills?.length > 0 ? (
-                      participant.skills.map((skill, index) => (
+                      participant.skills.slice(0, 4).map((skill, index) => (
                         <span
                           key={`${participant._id}-${index}`}
-                          className="
-                rounded-full
-                border border-primary/15
-                bg-primary/5
-                px-3
-                py-1.5
-                text-xs
-                text-primary/80
-                transition-all
-                duration-300
-                group-hover:border-primary/25
-              "
+                          className="text-[11px] text-primary/80 "
                         >
-                          {skill}
+                          #{skill}{" "}
                         </span>
                       ))
                     ) : (
@@ -369,59 +397,137 @@ const teamLeaderId =
                       </span>
                     )}
                   </div>
-                </div>
+                  </div>
 
-                {/* Team Leader Action */}
-                {isAuthenticated && isTeamLeader && (
-                  <button
-                    type="button"
-                    onClick={() => handleSendInvitation(participant._id)}
-                    disabled={sendingInvitation === participant._id}
-                    className="
-          relative
-          mt-7
-          w-full
-          rounded-xl
-          border border-primary
-          hover:bg-primary
-          cursor-pointer
-          px-4
-          py-3
-          text-sm
-          font-semibold
-          text-white
-          shadow-[0_0_20px_rgba(32,178,166,0.15)]
-          transition-all
-          duration-300
-          hover:-translate-y-0.5
-          hover:shadow-[0_0_30px_rgba(32,178,166,0.3)]
-          active:scale-[0.98]
-          disabled:cursor-not-allowed
-          disabled:opacity-50
-        "
-                  >
-                    {sendingInvitation === participant._id
-                      ? "Sending Invitation..."
-                      : "Invite to Join Team →"}
-                  </button>
-                )}
+                  {/* Invite Button */}
+                  {isAuthenticated && isTeamLeader && (
+                    <button
+                      type="button"
+                      onClick={() => handleSendInvitation(participant._id)}
+                      disabled={sendingInvitation === participant._id}
+                      className={`
+                      cursor-pointer
+              mt-1
+              w-full
+
+              max-w-40
+              rounded-2xl
+              border
+              border-primary
+
+              px-4
+              py-2.5
+              text-xs
+              font-semibold
+              text-white
+              transition-all
+              duration-300
+              hover:bg-primary
+              active:bg-primary
+              hover:-translate-y-0.5
+              hover:shadow-[0_0_25px_rgba(32,178,166,0.25)]
+              active:scale-[0.98]
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+              ${sendingInvitation === participant._id
+                        ? "bg-primary"
+                        : "bg-primary/5"}
+            `}
+                    >
+                      {sendingInvitation === participant._id
+                        ? "Sending Invitation..."
+                        : "Invite to Join Team →"}
+                    </button>
+                  )}
+                </div>
 
                 {/* Bottom Accent */}
                 <div
                   className="
-        absolute
-        bottom-0
-        left-0
-        h-px
-        w-0
-        bg-primary
-        transition-all
-        duration-500
-        group-hover:w-full
-      "
+          absolute
+          bottom-0
+          left-0
+          h-px
+          w-0
+          bg-primary
+          transition-all
+          duration-500
+          group-hover:w-full
+        "
                 />
               </div>
             ))}
+          </div>
+        )}
+
+
+        {selectedAvatar && (
+          <div
+            className="
+      fixed
+      inset-0
+      z-100
+      flex
+      items-center
+      justify-center
+      bg-black/85
+      px-4
+      backdrop-blur-sm
+    "
+            onClick={() => setSelectedAvatar(null)}
+          >
+            <div
+              className="relative max-w-3xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close */}
+              <button
+                type="button"
+                onClick={() => setSelectedAvatar(null)}
+                className="
+          absolute
+          -right-3
+          -top-3
+          z-10
+          flex
+          h-10
+          w-10
+          items-center
+          justify-center
+          rounded-full
+          border border-white/10
+          bg-black/70
+          text-xl
+          text-white
+          transition-all
+          hover:bg-primary
+          cursor-pointer
+        "
+              >
+                ×
+              </button>
+
+              {/* Image */}
+              <img
+                src={selectedAvatar.src}
+                alt={selectedAvatar.name}
+                className="
+          max-h-3/4
+          max-w-3/4
+          rounded-3xl
+          border
+          border-primary/30
+          object-contain
+          shadow-[0_0_60px_rgba(32,178,166,0.2)]
+          mx-auto
+        "
+              />
+
+              {/* Name */}
+              <p className="mt-4 text-center text-sm font-medium text-white/80">
+                {selectedAvatar.name}
+              </p>
+            </div>
           </div>
         )}
       </section>

@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useSihAuth } from "../../context/SihAuthContext";
 import GridAnimation from "../../components/GridAnimation";
 import ParticipantAvatar from "../../components/ParticipantAvatar";
+import { div } from "framer-motion/client";
 
 
 function TeamDetails() {
@@ -16,6 +17,7 @@ function TeamDetails() {
     loading: authLoading,
   } = useSihAuth();
 
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [team, setTeam] = useState(null);
   const [requests, setRequests] = useState([]);
 
@@ -432,7 +434,7 @@ function TeamDetails() {
           text-white/45
           transition-all
           duration-300
-          hover:translate-x-[-2px]
+          hover:-translate-x-0.5
           hover:text-primary
         "
         >
@@ -447,9 +449,9 @@ function TeamDetails() {
           relative
           mt-6
           overflow-hidden
-          rounded-[2rem]
+          rounded-4xl
           border border-primary/25
-          bg-gradient-to-br
+          bg-linear-to-br
           from-primary/10
           via-white/5
           to-transparent
@@ -495,31 +497,6 @@ function TeamDetails() {
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
 
               <div className="flex items-start gap-5">
-
-                {/* Team Logo / Initial */}
-                <div
-                  className="
-                  flex
-                  h-20
-                  w-20
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  border
-                  border-primary/30
-                  bg-primary/10
-                  text-3xl
-                  font-black
-                  text-primary
-                  shadow-[0_0_30px_rgba(32,178,166,0.15)]
-                  sm:h-24
-                  sm:w-24
-                  sm:text-4xl
-                "
-                >
-                  {team.teamName?.charAt(0)?.toUpperCase()}
-                </div>
 
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary">
@@ -603,7 +580,7 @@ function TeamDetails() {
                   className="
                   h-full
                   rounded-full
-                  bg-gradient-to-r
+                  bg-linear-to-r
                   from-primary
                   to-teal-300
                   shadow-[0_0_15px_rgba(32,178,166,0.5)]
@@ -646,11 +623,298 @@ function TeamDetails() {
         )}
 
         {/* ==================================================
-          TEAM MEMBERS
-      ================================================== */}
+  TEAM LEADER
+================================================== */}
+        <section className="mt-12">
+
+          <div className="mb-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              Team Leadership
+            </p>
+
+            <h2 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
+              Team Leader
+            </h2>
+          </div>
+
+          <div
+            className="
+      relative
+      overflow-hidden
+      rounded-4xl
+      border border-primary/25
+      bg-linear-to-br
+      from-primary/10
+      via-white/5
+      to-transparent
+      p-6
+      sm:p-8
+      lg:p-10
+      backdrop-blur-xl
+      shadow-[0_0_50px_rgba(32,178,166,0.10)]
+    "
+          >
+            {/* Background glow */}
+            <div
+              className="
+    pointer-events-none
+    absolute
+    -top-24
+    left-1/2
+    h-72
+    w-72
+    -translate-x-1/2
+    rounded-full
+    bg-primary/10
+    blur-[100px]
+  "
+            />
+
+            <div className="relative z-10 flex flex-col items-center text-center">
+
+              {/* Profile Picture */}
+              <button
+                type="button"
+                disabled={!leader?.profileImage}
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  if (leader?.profileImage) {
+                    setSelectedAvatar({
+                      src: leader.profileImage,
+                      name: leader.name,
+                    });
+                  }
+                }}
+                className="
+      group/avatar
+      relative
+      h-40
+      w-40
+      overflow-hidden
+      rounded-full
+      border-2
+      border-primary
+      bg-primary/10
+      shadow-[0_0_25px_rgba(32,178,166,0.2)]
+      transition-all
+      duration-300
+      hover:scale-105
+      hover:shadow-[0_0_35px_rgba(32,178,166,0.35)]
+      disabled:cursor-default
+    "
+              >
+                <ParticipantAvatar
+                  src={leader?.profileImage}
+                  name={leader?.name}
+                  size="h-full w-full"
+                  className="rounded-full"
+                  textClassName="text-4xl font-bold text-primary"
+                />
+
+                {/* View Photo Overlay */}
+                {leader?.profileImage && (
+                  <span
+                    className="
+                    cursor-pointer
+          absolute
+          inset-0
+          flex
+          items-center
+          justify-center
+          rounded-full
+          bg-black/55
+          text-xs
+          font-semibold
+          text-white
+          opacity-0
+          transition-opacity
+          duration-300
+          group-hover/avatar:opacity-100
+        "
+                  >
+                    View Photo
+                  </span>
+                )}
+              </button>
+
+              {/* Name */}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+
+                <h3 className="text-2xl font-bold text-white sm:text-3xl">
+                  {leader?.name || "Unknown Leader"}
+                </h3>
+
+                <span
+                  className="
+            rounded-full
+            border border-primary/30
+            bg-primary/10
+            px-3
+            py-1
+            text-[10px]
+            font-bold
+            uppercase
+            tracking-wider
+            text-primary
+          "
+                >
+                  Team Leader
+                </span>
+
+              </div>
+
+              {/* Academic Info */}
+              <div className="mt-3 flex flex-wrap justify-center gap-2">
+
+                {leader?.branch && (
+                  <span
+                    className="
+              rounded-full
+              border border-white/10
+              bg-black/20
+              px-3
+              py-1.5
+              text-xs
+              text-white/60
+            "
+                  >
+                    {leader.branch}
+                  </span>
+                )}
+
+                {leader?.year && (
+                  <span
+                    className="
+              rounded-full
+              border border-white/10
+              bg-black/20
+              px-3
+              py-1.5
+              text-xs
+              text-white/60
+            "
+                  >
+                    Year - {leader.year}
+                  </span>
+                )}
+
+                {leader?.department && (
+                  <span
+                    className="
+              rounded-full
+              border border-white/10
+              bg-black/20
+              px-3
+              py-1.5
+              text-xs
+              text-white/60
+            "
+                  >
+                    {leader.department}
+                  </span>
+                )}
+
+              </div>
+
+              {/* Contact Details */}
+              <div
+                className="
+          mt-8
+          w-full
+          max-w-2xl
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          gap-4
+        "
+              >
+
+                <div
+                  className="
+            rounded-2xl
+            border border-white/10
+            bg-black/20
+            p-4
+            hover:bg-primary/12
+            hover:border-primary
+          "
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-white/30">
+                    Email
+                  </p>
+
+                  <p className="mt-2 break-all text-sm text-white/80">
+                    {leader?.email || "Not available"}
+                  </p>
+                </div>
+
+                <div
+                  className="
+            rounded-2xl
+            border border-white/10
+            bg-black/20
+            p-4
+            hover:bg-primary/12
+            hover:border-primary
+          "
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-white/30">
+                    Phone
+                  </p>
+
+                  <p className="mt-2 text-sm text-white/80">
+                    {leader?.phone || "Not available"}
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Skills */}
+              {leader?.skills?.length > 0 && (
+                <div className="mt-6 w-full max-w-2xl">
+
+                  <p className="mb-3 text-[10px] uppercase tracking-wider text-white/30">
+                    Skills
+                  </p>
+
+                  <div className="flex flex-wrap justify-center gap-2">
+
+                    {leader.skills.map((skill, index) => (
+                      <span
+                        key={`${skill}-${index}`}
+                        className="
+                  rounded-full
+                  border border-primary/20
+                  bg-primary/5
+                  px-3
+                  py-1.5
+                  text-xs
+                  font-medium
+                  text-primary
+                "
+                      >
+                        #{skill}
+                      </span>
+                    ))}
+
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+          </div>
+        </section>
+
+
+        {/* ==================================================
+  TEAM MEMBERS
+================================================== */}
         <section className="mt-12">
 
           <div className="mb-5 flex items-end justify-between gap-4">
+
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
                 The Squad
@@ -661,93 +925,29 @@ function TeamDetails() {
               </h2>
             </div>
 
-            <span className="rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+            <span
+              className="
+        rounded-full
+        border border-primary/15
+        bg-primary/5
+        px-3
+        py-1
+        text-xs
+        font-semibold
+        text-primary
+      "
+            >
               {totalMembers} / 6
             </span>
+
           </div>
 
-          {/* Leader */}
-          <div
-            className="
-            mb-5
-            relative
-            overflow-hidden
-            rounded-3xl
-            border border-primary/25
-            bg-gradient-to-r
-            from-primary/10
-            to-transparent
-            p-6
-            backdrop-blur-md
-          "
-          >
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-
-              <ParticipantAvatar
-                src={leader?.profileImage}
-                name={leader?.name}
-                size="h-16 w-16"
-                className="rounded-2xl border border-primary/30 bg-primary/10 shadow-[0_0_20px_rgba(32,178,166,0.12)]"
-                textClassName="text-2xl font-bold text-primary"
-              />
-
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-xl font-bold text-white">
-                    {leader?.name}
-                  </h3>
-
-                  <span
-                    className="
-                    rounded-full
-                    bg-primary/10
-                    px-2.5
-                    py-1
-                    text-[10px]
-                    font-bold
-                    uppercase
-                    tracking-wider
-                    text-primary
-                  "
-                  >
-                    Leader
-                  </span>
-                </div>
-
-                <p className="mt-1 text-sm text-white/40">
-                  {leader?.email}
-                </p>
-
-                {/* <p className="mt-1 text-sm text-white/40">
-                  {leader?.phone}
-                </p> */}
-
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {leader?.branch && (
-                    <span className="rounded-full bg-black/20 px-3 py-1 text-xs text-white/55">
-                      {leader.branch}
-                    </span>
-                  )}
-
-                  {leader?.year && (
-                    <span className="rounded-full bg-black/20 px-3 py-1 text-xs text-white/55">
-                      Year {leader.year}
-                    </span>
-                  )}
-
-                  {leader?.department && (
-                    <span className="rounded-full bg-black/20 px-3 py-1 text-xs text-white/55">
-                      {leader.department}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Other Members */}
           <div className="grid gap-5 sm:grid-cols-2">
+            {team.members?.length === 1 && (
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-sm text-white/40 backdrop-blur-md">
+                No other members have joined yet.
+              </div>
+            )}
 
             {team.members?.map((member) => {
 
@@ -759,20 +959,20 @@ function TeamDetails() {
                 <div
                   key={member._id}
                   className="
-                  group
-                  relative
-                  overflow-hidden
-                  rounded-3xl
-                  border border-white/10
-                  bg-white/5
-                  p-5
-                  backdrop-blur-md
-                  transition-all
-                  duration-300
-                  hover:-translate-y-1
-                  hover:border-primary/25
-                  hover:bg-primary/5
-                "
+            group
+            relative
+            overflow-hidden
+            rounded-3xl
+            border border-white/10
+            bg-white/5
+            p-5
+            backdrop-blur-md
+            transition-all
+            duration-300
+            hover:-translate-y-1
+            hover:border-primary/25
+            hover:bg-primary/5
+          "
                 >
 
                   <div className="flex gap-4">
@@ -780,8 +980,12 @@ function TeamDetails() {
                     <ParticipantAvatar
                       src={member.profileImage}
                       name={member.name}
-                      size="h-12 w-12"
-                      className="rounded-xl border border-white/10 bg-black/20"
+                      size="h-14 w-14"
+                      className="
+                rounded-xl
+                border border-white/10
+                bg-black/20
+              "
                       textClassName="font-semibold text-primary"
                     />
 
@@ -791,42 +995,52 @@ function TeamDetails() {
                         {member.name}
                       </h3>
 
-                      {isTeamLeader && (
-                        <>
-                          <p className="mt-1 text-sm text-white/40">
-                            {member.email}
-                          </p>
-
-                          <p className="mt-1 text-sm text-white/40">
-                            {member.phone}
-                          </p>
-                        </>
-                      )}
-
                       <div className="mt-3 flex flex-wrap gap-2">
+
                         {member.branch && (
-                          <span className="rounded-full bg-black/20 px-2.5 py-1 text-xs text-white/55">
+                          <span
+                            className="
+                      rounded-full
+                      bg-black/20
+                      px-2.5
+                      py-1
+                      text-xs
+                      text-white/55
+                    "
+                          >
                             {member.branch}
                           </span>
                         )}
 
                         {member.year && (
-                          <span className="rounded-full bg-black/20 px-2.5 py-1 text-xs text-white/55">
-                            Year {member.year}
+                          <span
+                            className="
+                      rounded-full
+                      bg-black/20
+                      px-2.5
+                      py-1
+                      text-xs
+                      text-white/55
+                    "
+                          >
+                            Year - {member.year}
                           </span>
                         )}
+
                       </div>
 
                       {member.skills?.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
+
                           {member.skills.map((skill, index) => (
                             <span
-                              key={index}
+                              key={`${skill}-${index}`}
                               className="text-xs text-primary/80"
                             >
                               #{skill}
                             </span>
                           ))}
+
                         </div>
                       )}
 
@@ -834,31 +1048,30 @@ function TeamDetails() {
 
                   </div>
 
+                  {/* Leader Controls */}
                   {isTeamLeader && (
                     <button
                       type="button"
-                      onClick={() =>
-                        handleRemoveMember(member._id)
-                      }
+                      onClick={() => handleRemoveMember(member._id)}
                       disabled={removing === member._id}
                       className="
-                      mt-5
-                      w-full
-                      rounded-xl
-                      border border-red-400/15
-                      bg-red-400/5
-                      px-4
-                      py-2.5
-                      text-xs
-                      font-semibold
-                      text-red-400
-                      transition-all
-                      duration-300
-                      hover:border-red-400/30
-                      hover:bg-red-400/10
-                      disabled:cursor-not-allowed
-                      disabled:opacity-50
-                    "
+                mt-5
+                w-full
+                rounded-xl
+                border border-red-400/15
+                bg-red-400/5
+                px-4
+                py-2.5
+                text-xs
+                font-semibold
+                text-red-400
+                transition-all
+                duration-300
+                hover:border-red-400/30
+                hover:bg-red-400/10
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
                     >
                       {removing === member._id
                         ? "Removing..."
@@ -1171,6 +1384,78 @@ function TeamDetails() {
           )}
 
         </div>
+
+        {selectedAvatar && (
+          <div
+            className="
+      fixed
+      inset-0
+      z-100
+      flex
+      items-center
+      justify-center
+      bg-black/85
+      p-4
+      backdrop-blur-md
+    "
+            onClick={() => setSelectedAvatar(null)}
+          >
+            <div
+              className="relative flex max-h-[95vh] max-w-[95vw] flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedAvatar(null)}
+                className="
+          absolute
+          -right-3
+          -top-3
+          z-20
+          flex
+          h-10
+          w-10
+          items-center
+          justify-center
+          rounded-full
+          border
+          border-white/10
+          bg-black/80
+          text-xl
+          text-white
+          transition-all
+          duration-300
+          hover:scale-105
+          hover:bg-primary
+          cursor-pointer
+        "
+              >
+                ×
+              </button>
+
+              {/* Large Image */}
+              <img
+                src={selectedAvatar.src}
+                alt={selectedAvatar.name}
+                className="
+          max-h-3/4
+          max-w-3/4
+          rounded-3xl
+          border
+          border-primary/30
+          object-contain
+          shadow-[0_0_60px_rgba(32,178,166,0.25)]
+        "
+              />
+
+              {/* Name */}
+              <p className="mt-4 text-center text-sm font-semibold text-white/80">
+                {selectedAvatar.name}
+              </p>
+            </div>
+          </div>
+        )}
 
       </section>
     </div>

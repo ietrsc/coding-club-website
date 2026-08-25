@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useSihAuth } from "../context/SihAuthContext";
 import ParticipantAvatar from "./ParticipantAvatar";
+import { LogOut } from "lucide-react";
 
 function Navbar() {
   const location = useLocation();
@@ -12,7 +13,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [invitationCount, setInvitationCount] = useState(0);
 
-  const { user, isAuthenticated, logout, loading:authLoading } = useSihAuth();
+  const { user, isAuthenticated, logout, loading: authLoading } = useSihAuth();
 
   // ==========================================
   // LOGOUT
@@ -115,9 +116,8 @@ function Navbar() {
 
   return (
     <header
-      className={`h-15 min-w-full sm:h-20 fixed top-0 left-0 right-0 z-50 ${
-        isScrolled ? "glass py-3" : "bg-transparent py-5"
-      }`}
+      className={`h-15 min-w-full sm:h-20 fixed top-0 left-0 right-0 z-50 ${isScrolled ? "glass py-3" : "bg-transparent py-5"
+        }`}
     >
       {/* ==========================================
           MAIN NAVBAR
@@ -155,11 +155,10 @@ function Navbar() {
 
             <Link
               to="/"
-              className={`px-4 py-2 text-sm rounded-full ${
-                location.pathname === "/"
+              className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/"
                   ? "bg-surface text-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-surface"
-              }`}
+                }`}
             >
               Home
             </Link>
@@ -168,11 +167,10 @@ function Navbar() {
 
             <Link
               to="/events"
-              className={`px-4 py-2 text-sm rounded-full ${
-                location.pathname === "/events"
+              className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/events"
                   ? "bg-surface text-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-surface"
-              }`}
+                }`}
             >
               Events
             </Link>
@@ -181,11 +179,10 @@ function Navbar() {
 
             <Link
               to="/members"
-              className={`px-4 py-2 text-sm rounded-full ${
-                location.pathname === "/members"
+              className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/members"
                   ? "bg-surface text-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-surface"
-              }`}
+                }`}
             >
               Members
             </Link>
@@ -197,52 +194,166 @@ function Navbar() {
         ========================================= */}
 
 
-        <div className={`hidden  items-center gap-3 ${location.pathname.includes("/sih") ? "md:flex": "md:hidden"} ${isAuthenticated ? "md:flex": "md:hidden"}`}>
+        <div
+          className={`
+    hidden
+    items-center
+    gap-2
+    ${isAuthenticated ? "md:flex" : "md:hidden"}
+  `}
+        >
           {isAuthenticated ? (
             <>
+              {/* Invitations */}
               <Link
                 to="/sih/invitations"
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-primary/10 hover:text-primary ${location.pathname == "/sih/invitations" ? "bg-primary/10 text-primary" : ""}`}
+                className={`
+          relative
+          flex
+          items-center
+          gap-2
+          rounded-xl
+          border
+          px-4
+          py-2
+          text-sm
+          font-medium
+          transition-all
+          duration-300
+          ${location.pathname === "/sih/invitations"
+                    ? "border-primary/30 bg-primary/10 text-primary shadow-[0_0_18px_rgba(32,178,166,0.08)]"
+                    : "border-white/10 bg-white/5 text-white/60 hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                  }
+        `}
               >
                 <span>Invitations</span>
 
                 {invitationCount > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs text-white">
+                  <span
+                    className="
+              flex
+              h-5
+              min-w-5
+              items-center
+              justify-center
+              rounded-full
+              bg-primary
+              px-1
+              text-[10px]
+              font-bold
+              text-white
+              shadow-[0_0_12px_rgba(32,178,166,0.35)]
+            "
+                  >
                     {invitationCount}
                   </span>
                 )}
               </Link>
-              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+
+              {/* User */}
+              <div
+                className="
+          flex
+          items-center
+          gap-2.5
+          rounded-xl
+          border
+          border-white/10
+          bg-white/5
+          px-3
+          py-1.5
+          backdrop-blur-md
+        "
+              >
                 <ParticipantAvatar
                   src={user?.participantId?.profileImage}
                   name={user?.participantId?.name}
-                  size="h-7 w-7"
-                  className="rounded-full bg-primary/10"
+                  size="h-8 w-8"
+                  className="
+            rounded-full
+            border
+            border-primary/20
+            bg-primary/10
+          "
                   textClassName="text-xs font-semibold text-primary"
                 />
-                {user?.participantId?.name || "Participant"}
-              </span>
 
+                <span className="max-w-32 truncate text-sm font-medium text-white/70">
+                  {user?.participantId?.name || "Participant"}
+                </span>
+              </div>
+
+              {/* Logout */}
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-xl border border-red-500/30 px-4 py-2 text-sm text-red-500 transition hover:bg-red-500/10"
+                className="
+          rounded-xl
+          border
+          border-red-500/20
+          bg-red-500/5
+          px-4
+          py-2
+          text-sm
+          font-medium
+          text-red-400
+          transition-all
+          duration-300
+          hover:border-red-500/40
+          hover:bg-red-500/10
+          hover:text-red-300
+          active:scale-95
+          cursor-pointer
+        "
               >
-                Logout
+                <LogOut className="h-4 w-4" />
               </button>
             </>
           ) : (
             <>
+              {/* SIH Login */}
               <Link
                 to="/sih/login"
-                className="rounded-xl border border-border px-4 py-2 text-sm transition hover:border-primary hover:text-primary"
+                className="
+          rounded-xl
+          border
+          border-white/10
+          bg-white/5
+          px-4
+          py-2
+          text-sm
+          font-medium
+          text-white/65
+          transition-all
+          duration-300
+          hover:border-primary/30
+          hover:bg-primary/5
+          hover:text-primary
+        "
               >
                 SIH Login
               </Link>
 
+              {/* SIH Sign Up */}
               <Link
                 to="/sih/signup"
-                className="rounded-xl border bg-surface hover:bg-primary border-primary px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                className="
+          rounded-xl
+          border
+          border-primary
+          bg-primary/10
+          px-4
+          py-2
+          text-sm
+          font-semibold
+          text-white
+          shadow-[0_0_18px_rgba(32,178,166,0.12)]
+          transition-all
+          duration-300
+          hover:bg-primary
+          hover:shadow-[0_0_28px_rgba(32,178,166,0.25)]
+          active:scale-95
+        "
               >
                 SIH Sign Up
               </Link>
@@ -268,15 +379,13 @@ function Navbar() {
       =========================================== */}
 
       <div
-        className={`md:hidden mt-6 mx-4 rounded-xl py-4 flex flex-col items-center justify-center gap-3 transition-all duration-300 ease-in-out ${
-          location.pathname === "/"
+        className={`md:hidden mt-6 mx-4 rounded-xl py-4 flex flex-col items-center justify-center gap-3 transition-all duration-300 ease-in-out ${location.pathname === "/"
             ? "bg-linear-to-b from-primary/5 via-black/90 to-primary/10"
             : "bg-background/90"
-        } ${
-          menuOpen
+          } ${menuOpen
             ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 -translate-y-4 pointer-events-none"
-        }`}
+          }`}
       >
         {/* Home */}
 
@@ -322,50 +431,49 @@ function Navbar() {
             MOBILE SIH AUTH
         ========================================= */}
 
-        <div className={`${
-            location.pathname.includes("/sih") ?  isAuthenticated ? "flex": "hidden" : ""
+        <div className={`${location.pathname.includes("/sih") ? isAuthenticated ? "flex" : "hidden" : ""
           } `}>
 
-        {isAuthenticated ? (
-          <div className="flex justify-evenly items-center gap-3">
-            <span className="flex items-center gap-2 text-sm text-foreground">
-              <ParticipantAvatar
-                src={user?.participantId?.profileImage}
-                name={user?.participantId?.name}
-                size="h-7 w-7"
-                className="rounded-full bg-primary/10"
-                textClassName="text-xs font-semibold text-primary"
-              />
-              {user?.participantId?.name || "Participant"}
-            </span>
+          {isAuthenticated ? (
+            <div className="flex justify-evenly items-center gap-3">
+              <span className="flex items-center gap-2 text-sm text-foreground">
+                <ParticipantAvatar
+                  src={user?.participantId?.profileImage}
+                  name={user?.participantId?.name}
+                  size="h-7 w-7"
+                  className="rounded-full bg-primary/10"
+                  textClassName="text-xs font-semibold text-primary"
+                />
+                {user?.participantId?.name || "Participant"}
+              </span>
 
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-xl border border-red-500/30 px-4 py-2 text-sm text-red-500 transition hover:bg-red-500/10"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <Link
-              to="/sih/login"
-              onClick={() => setMenuOpen(false)}
-              className="text-sm transition hover:text-primary"
-            >
-              SIH Login
-            </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-xl border border-red-500/30 px-4 py-2 text-sm text-red-500 transition hover:bg-red-500/10"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link
+                to="/sih/login"
+                onClick={() => setMenuOpen(false)}
+                className="text-sm transition hover:text-primary"
+              >
+                SIH Login
+              </Link>
 
-            <Link
-              to="/sih/signup"
-              onClick={() => setMenuOpen(false)}
-              className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white"
-            >
-              SIH Sign Up
-            </Link>
-          </div>
-        )}
+              <Link
+                to="/sih/signup"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white"
+              >
+                SIH Sign Up
+              </Link>
+            </div>
+          )}
 
         </div>
 
