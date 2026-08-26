@@ -181,6 +181,18 @@ function Navbar() {
               Events
             </Link>
 
+            {/* Home */}
+
+            <Link
+              to="/sih"
+              className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/sih"
+                ? "bg-surface text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface"
+                }`}
+            >
+              SIH
+            </Link>
+
             {/* Members */}
 
             <Link
