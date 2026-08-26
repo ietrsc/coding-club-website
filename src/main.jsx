@@ -33,6 +33,9 @@ import Login from "./pages/sih/Login.jsx";
 import ProtectedSihRoute from "./components/ProtectedSihRoute.jsx";
 import MyInvitations from "./pages/sih/MyInvitations.jsx";
 import ParticipantsDetails from "./pages/sih/ParticipantsDetails.jsx";
+import VerifyEmail from "./pages/sih/VerifyEmail.jsx";
+
+
 
 
 const router = createBrowserRouter([
@@ -114,6 +117,10 @@ const router = createBrowserRouter([
       {
         path: "/sih/signup",
         element: <Signup />,
+      },
+            {
+        path: "/sih/verify-email",
+        element: <VerifyEmail />,
       },
 
       {

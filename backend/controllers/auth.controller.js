@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 import User from "../models/User.model.js";
 import Participant from "../models/Participant.model.js";
@@ -7,7 +8,15 @@ import Participant from "../models/Participant.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { uploadProfileImageBuffer, deleteProfileImage } from "../utils/cloudinary.js";
+
+import {
+  uploadProfileImageBuffer,
+  deleteProfileImage,
+} from "../utils/cloudinary.js";
+
+import {
+  sendVerificationEmail,
+} from "../nodemailer/email.js";
 
 
 // ==========================================
@@ -24,6 +33,21 @@ const generateAccessToken = (userId) => {
       expiresIn: "1d",
     }
   );
+};
+
+
+// ==========================================
+// ACCESS TOKEN COOKIE OPTIONS
+// ==========================================
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite:
+    process.env.NODE_ENV === "production"
+      ? "none"
+      : "lax",
+  maxAge: 24 * 60 * 60 * 1000,
 };
 
 
@@ -83,6 +107,10 @@ const signup = asyncHandler(async (req, res) => {
     );
   }
 
+  // ------------------------------------------
+  // Password validation
+  // ------------------------------------------
+
   if (password.length < 6) {
     throw new ApiError(
       400,
@@ -132,13 +160,15 @@ const signup = asyncHandler(async (req, res) => {
   try {
     uploadedImage = await uploadProfileImageBuffer(
       req.file.buffer,
-      { publicIdPrefix: normalizedEmail }
+      {
+        publicIdPrefix: normalizedEmail,
+      }
     );
   } catch (error) {
-    // Log the real Cloudinary error server-side — the
-    // response only gets a generic message so we don't leak
-    // internals, but you need the real reason in the logs.
-    console.error("Cloudinary upload failed (signup):", error);
+    console.error(
+      "Cloudinary upload failed (signup):",
+      error
+    );
 
     throw new ApiError(
       500,
@@ -147,7 +177,13 @@ const signup = asyncHandler(async (req, res) => {
   }
 
   // ------------------------------------------
-  // Create Participant
+  // Track whether participant was created here
+  // ------------------------------------------
+
+  let participantCreated = false;
+
+  // ------------------------------------------
+  // Create / update Participant
   // ------------------------------------------
 
   if (!participant) {
@@ -162,30 +198,38 @@ const signup = asyncHandler(async (req, res) => {
         year,
         skills,
         profileImage: uploadedImage.secure_url,
-        profileImagePublicId: uploadedImage.public_id,
+        profileImagePublicId:
+          uploadedImage.public_id,
       });
+
+      participantCreated = true;
     } catch (error) {
-      // Participant creation failed — don't leave an
-      // orphaned image sitting in Cloudinary.
-      await deleteProfileImage(uploadedImage.public_id);
+      await deleteProfileImage(
+        uploadedImage.public_id
+      );
+
       throw error;
     }
   } else {
-    // ------------------------------------------
-    // Edge case: this person was already added as a
-    // bare Participant by a team leader (with a photo
-    // the LEADER uploaded on their behalf). They're now
-    // signing up for their own account, so their own
-    // photo replaces the leader-supplied one.
-    // ------------------------------------------
+    // Participant already exists but has no
+    // user account yet.
 
-    const oldPublicId = participant.profileImagePublicId;
+    const oldPublicId =
+      participant.profileImagePublicId;
 
-    participant.profileImage = uploadedImage.secure_url;
-    participant.profileImagePublicId = uploadedImage.public_id;
+    participant.profileImage =
+      uploadedImage.secure_url;
+
+    participant.profileImagePublicId =
+      uploadedImage.public_id;
 
     await participant.save();
-    await deleteProfileImage(oldPublicId);
+
+    if (oldPublicId) {
+      await deleteProfileImage(
+        oldPublicId
+      );
+    }
   }
 
   // ------------------------------------------
@@ -194,6 +238,25 @@ const signup = asyncHandler(async (req, res) => {
 
   const hashedPassword =
     await bcrypt.hash(password, 10);
+
+  // ------------------------------------------
+  // Generate 6-digit verification code
+  // ------------------------------------------
+
+  const verificationCode =
+    crypto
+      .randomInt(100000, 1000000)
+      .toString();
+
+  // ------------------------------------------
+  // Hash verification code before saving
+  // ------------------------------------------
+
+  const hashedVerificationToken =
+    crypto
+      .createHash("sha256")
+      .update(verificationCode)
+      .digest("hex");
 
   // ------------------------------------------
   // Create User
@@ -206,14 +269,29 @@ const signup = asyncHandler(async (req, res) => {
       participantId: participant._id,
       email: normalizedEmail,
       password: hashedPassword,
+
+      isEmailVerified: false,
+
+      emailVerificationToken:
+        hashedVerificationToken,
+
+      emailVerificationExpires:
+        new Date(
+          Date.now() + 15 * 60 * 1000
+        ),
     });
   } catch (error) {
-    // If user creation fails, remove the
-    // participant only if we created it here.
-    if (participant && !participant.userId) {
-      await deleteProfileImage(
-        participant.profileImagePublicId
-      );
+    // Roll back only if this signup created
+    // the participant.
+
+    if (participantCreated) {
+      if (
+        participant?.profileImagePublicId
+      ) {
+        await deleteProfileImage(
+          participant.profileImagePublicId
+        );
+      }
 
       await Participant.findByIdAndDelete(
         participant._id
@@ -231,48 +309,287 @@ const signup = asyncHandler(async (req, res) => {
   await participant.save();
 
   // ------------------------------------------
-  // Generate token
+  // Send verification email
   // ------------------------------------------
 
-  const accessToken =
-    generateAccessToken(user._id);
+  try {
+    await sendVerificationEmail(
+      normalizedEmail,
+      verificationCode
+    );
+  } catch (error) {
+    console.error(
+      "Verification email sending failed:",
+      error
+    );
+
+    // User remains unverified.
+    // A resend-code endpoint can be added later.
+  }
 
   // ------------------------------------------
-  // Set HTTP-only cookie
+  // Get participant data
   // ------------------------------------------
-
-  res.cookie(
-    "accessToken",
-    accessToken,
-    {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite:
-        process.env.NODE_ENV === "production"
-          ? "none"
-          : "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    }
-  );
 
   const participantData =
     await Participant.findById(
       participant._id
-    ).select(
-      "-__v"
-    );
+    ).select("-__v");
+
+  // ------------------------------------------
+  // IMPORTANT:
+  // No access token or cookie is created here.
+  // User must verify their email first.
+  // ------------------------------------------
 
   return res.status(201).json(
     new ApiResponse(
       201,
       {
         userId: user._id,
+        email: user.email,
         participant: participantData,
+        isEmailVerified: false,
       },
-      "Account created successfully"
+      "Account created successfully. Please check your email and verify your account."
     )
   );
 });
+
+
+// ==========================================
+// VERIFY EMAIL
+// ==========================================
+
+const verifyEmail = asyncHandler(
+  async (req, res) => {
+    const { code } = req.body;
+
+    // ------------------------------------------
+    // Validate code
+    // ------------------------------------------
+
+    if (!code) {
+      throw new ApiError(
+        400,
+        "Verification code is required"
+      );
+    }
+
+    const verificationCode =
+      code.toString().trim();
+
+    if (!/^\d{6}$/.test(verificationCode)) {
+      throw new ApiError(
+        400,
+        "Please enter a valid 6-digit verification code"
+      );
+    }
+
+    // ------------------------------------------
+    // Hash received code
+    // ------------------------------------------
+
+    const hashedVerificationToken =
+      crypto
+        .createHash("sha256")
+        .update(verificationCode)
+        .digest("hex");
+
+    // ------------------------------------------
+    // Find user with valid, non-expired code
+    // ------------------------------------------
+
+    const user = await User.findOne({
+      emailVerificationToken:
+        hashedVerificationToken,
+
+      emailVerificationExpires: {
+        $gt: new Date(),
+      },
+    });
+
+    if (!user) {
+      throw new ApiError(
+        400,
+        "Invalid or expired verification code"
+      );
+    }
+
+    // ------------------------------------------
+    // Mark user as verified
+    // ------------------------------------------
+
+    user.isEmailVerified = true;
+
+    // Remove verification information
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+
+    await user.save();
+
+    // ------------------------------------------
+    // Generate access token
+    // ------------------------------------------
+
+    const accessToken =
+      generateAccessToken(user._id);
+
+    // ------------------------------------------
+    // Automatically log user in
+    // ------------------------------------------
+
+    res.cookie(
+      "accessToken",
+      accessToken,
+      cookieOptions
+    );
+
+    // ------------------------------------------
+    // Get participant data
+    // ------------------------------------------
+
+    const participant =
+      await Participant.findById(
+        user.participantId
+      ).select("-__v");
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          userId: user._id,
+          email: user.email,
+          participant,
+          isEmailVerified: true,
+        },
+        "Email verified successfully"
+      )
+    );
+  }
+);
+
+
+// ==========================================
+// RESEND VERIFICATION CODE
+// ==========================================
+
+const RESEND_COOLDOWN_MS = 60 * 1000; // 1 minute
+const VERIFICATION_CODE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+const resendVerificationCode = asyncHandler(
+  async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new ApiError(
+        400,
+        "Email is required"
+      );
+    }
+
+    const normalizedEmail =
+      email.trim().toLowerCase();
+
+    const user = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    if (!user) {
+      throw new ApiError(
+        404,
+        "No account found with this email"
+      );
+    }
+
+    if (user.isEmailVerified) {
+      throw new ApiError(
+        400,
+        "This email is already verified. Please login."
+      );
+    }
+
+    // ------------------------------------------
+    // Basic cooldown so this can't be spammed.
+    // The previous code's issue time is derived
+    // from its expiry timestamp minus its TTL.
+    // ------------------------------------------
+
+    if (user.emailVerificationExpires) {
+      const previousIssuedAt =
+        user.emailVerificationExpires.getTime() -
+        VERIFICATION_CODE_TTL_MS;
+
+      const elapsed =
+        Date.now() - previousIssuedAt;
+
+      if (elapsed < RESEND_COOLDOWN_MS) {
+        const waitSeconds = Math.ceil(
+          (RESEND_COOLDOWN_MS - elapsed) / 1000
+        );
+
+        throw new ApiError(
+          429,
+          `Please wait ${waitSeconds}s before requesting a new code`
+        );
+      }
+    }
+
+    // ------------------------------------------
+    // Generate a fresh 6-digit verification code
+    // ------------------------------------------
+
+    const verificationCode =
+      crypto
+        .randomInt(100000, 1000000)
+        .toString();
+
+    const hashedVerificationToken =
+      crypto
+        .createHash("sha256")
+        .update(verificationCode)
+        .digest("hex");
+
+    user.emailVerificationToken =
+      hashedVerificationToken;
+
+    user.emailVerificationExpires =
+      new Date(
+        Date.now() + VERIFICATION_CODE_TTL_MS
+      );
+
+    await user.save();
+
+    // ------------------------------------------
+    // Send the new code
+    // ------------------------------------------
+
+    try {
+      await sendVerificationEmail(
+        normalizedEmail,
+        verificationCode
+      );
+    } catch (error) {
+      console.error(
+        "Resend verification email failed:",
+        error
+      );
+
+      throw new ApiError(
+        500,
+        "Failed to send verification email. Please try again."
+      );
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { email: normalizedEmail },
+        "A new verification code has been sent to your email."
+      )
+    );
+  }
+);
 
 
 // ==========================================
@@ -328,28 +645,31 @@ const login = asyncHandler(async (req, res) => {
   }
 
   // ------------------------------------------
-  // Generate token
+  // Prevent unverified users from logging in
+  // ------------------------------------------
+
+  if (!user.isEmailVerified) {
+    throw new ApiError(
+      403,
+      "Please verify your email before logging in"
+    );
+  }
+
+  // ------------------------------------------
+  // Generate access token
   // ------------------------------------------
 
   const accessToken =
     generateAccessToken(user._id);
 
   // ------------------------------------------
-  // Set cookie
+  // Set authentication cookie
   // ------------------------------------------
 
   res.cookie(
     "accessToken",
     accessToken,
-    {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite:
-        process.env.NODE_ENV === "production"
-          ? "none"
-          : "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    }
+    cookieOptions
   );
 
   // ------------------------------------------
@@ -367,6 +687,7 @@ const login = asyncHandler(async (req, res) => {
       {
         userId: user._id,
         participant,
+        isEmailVerified: true,
       },
       "Login successful"
     )
@@ -379,14 +700,18 @@ const login = asyncHandler(async (req, res) => {
 // ==========================================
 
 const logout = asyncHandler(async (req, res) => {
-  res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite:
-      process.env.NODE_ENV === "production"
-        ? "none"
-        : "lax",
-  });
+  res.clearCookie(
+    "accessToken",
+    {
+      httpOnly: true,
+      secure:
+        process.env.NODE_ENV === "production",
+      sameSite:
+        process.env.NODE_ENV === "production"
+          ? "none"
+          : "lax",
+    }
+  );
 
   return res.status(200).json(
     new ApiResponse(
@@ -412,7 +737,8 @@ const getCurrentUser = asyncHandler(
         path: "participantId",
         populate: {
           path: "teamId",
-          select: "teamName leaderId",
+          select:
+            "teamName leaderId",
         },
       });
 
@@ -436,6 +762,8 @@ const getCurrentUser = asyncHandler(
 
 export {
   signup,
+  verifyEmail,
+  resendVerificationCode,
   login,
   logout,
   getCurrentUser,

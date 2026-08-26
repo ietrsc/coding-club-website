@@ -2,6 +2,8 @@ import express from "express";
 
 import {
   signup,
+  verifyEmail,
+  resendVerificationCode,
   login,
   logout,
   getCurrentUser,
@@ -16,6 +18,15 @@ router.post(
   "/signup",
   upload.single("profileImage"),
   signup
+);
+router.post(
+  "/verify-email",
+  verifyEmail
+);
+
+router.post(
+  "/resend-verification-code",
+  resendVerificationCode
 );
 
 router.post("/login", login);

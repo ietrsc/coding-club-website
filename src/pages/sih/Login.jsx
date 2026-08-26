@@ -15,12 +15,18 @@ function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Set when login fails specifically because the
+  // account's email hasn't been verified yet, so we
+  // can offer a link straight to the verify page.
+  const [needsVerification, setNeedsVerification] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setLoading(true);
     setError("");
     setSuccess("");
+    setNeedsVerification(false);
 
     try {
       const response = await fetch(
@@ -41,6 +47,12 @@ function Login() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Backend responds 403 specifically when the
+        // account exists but the email isn't verified.
+        if (response.status === 403) {
+          setNeedsVerification(true);
+        }
+
         throw new Error(
           data.message || "Invalid email or password"
         );
@@ -236,6 +248,19 @@ function Login() {
         "
                 >
                   {error}
+
+                  {needsVerification && (
+                    <>
+                      {" "}
+                      <Link
+                        to="/sih/verify-email"
+                        state={{ email: email.trim().toLowerCase() }}
+                        className="font-semibold text-primary hover:underline"
+                      >
+                        Verify your email
+                      </Link>
+                    </>
+                  )}
                 </div>
               )}
 

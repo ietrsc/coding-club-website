@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSihAuth } from "../../context/SihAuthContext";
+
 import GridAnimation from "../../components/GridAnimation";
 import { events } from "../../data/event";
 
 function Signup() {
-  const { fetchCurrentUser } = useSihAuth();
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -102,19 +102,15 @@ function Signup() {
         );
       }
 
-      const currentUser = await fetchCurrentUser();
+      setSuccess(
+  "Account created successfully! Please verify your email."
+);
 
-      if (!currentUser) {
-        throw new Error(
-          "Account was created, but user session could not be loaded"
-        );
-      }
-
-      setSuccess("Account created successfully!");
-
-      setTimeout(() => {
-        navigate("/sih");
-      }, 1000);
+navigate("/sih/verify-email", {
+  state: {
+    email: data.data.email,
+  },
+});
     } catch (err) {
       setError(
         err.message || "Something went wrong"

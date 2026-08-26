@@ -269,7 +269,6 @@ function Navbar() {
               </Link>
 
               {/* User */}
-              <Link to={`/sih/participants/${user?.participantId._id}`}>
               <div
                 className="
           flex
@@ -301,7 +300,6 @@ function Navbar() {
                   {user?.participantId?.name || "Participant"}
                 </span>
               </div>
-              </Link>
 
               {/* Logout */}
               <button
@@ -501,7 +499,6 @@ function Navbar() {
                   </span>
                 )}
               </Link>
-              <Link to={`/sih/participants/${user?.participantId?._id}`}>
               <span className="flex items-center gap-2 text-sm text-foreground">
                 <ParticipantAvatar
                   src={user?.participantId?.profileImage}
@@ -511,7 +508,7 @@ function Navbar() {
                   textClassName="text-xs font-semibold text-primary"
                 />
                 {user?.participantId?.name || "Participant"}
-              </span></Link>
+              </span>
 
               <button
                 type="button"

@@ -1,6 +1,7 @@
 import TeamInvitation from "../models/TeamInvitation.model.js";
 import Participant from "../models/Participant.model.js";
 import Team from "../models/Team.model.js";
+import User from "../models/User.model.js";
 import {ApiError} from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
@@ -150,11 +151,25 @@ if (
   );
 }
 
-  // Find participants who don't belong to any team
-  // and exclude the leader themselves
+  // Find all verified users, so we only offer
+  // email-verified participants for invitation
+  const verifiedUsers = await User.find({
+    isEmailVerified: true,
+  }).select("participantId");
+
+  const verifiedParticipantIds = verifiedUsers.map(
+    (user) => user.participantId
+  );
+
+  // Find participants who don't belong to any team,
+  // exclude the leader themselves, and only include
+  // participants whose email has been verified
   const participants = await Participant.find({
     teamId: null,
-    _id: { $ne: leaderParticipant._id },
+    _id: {
+      $ne: leaderParticipant._id,
+      $in: verifiedParticipantIds,
+    },
   }).select(
     "name email phone gender department branch year skills"
   );
@@ -288,7 +303,9 @@ await participant.save();
     // ==========================================
     // CLOSE ALL OTHER PENDING INVITATIONS
     // ==========================================
+invitation.status = "accepted";
 
+await invitation.save();
     await TeamInvitation.updateMany(
       {
         participantId: participant._id,
