@@ -825,7 +825,6 @@ function TeamDetails() {
           max-w-2xl
           grid
           grid-cols-1
-          sm:grid-cols-2
           gap-4
         "
               >
@@ -849,7 +848,7 @@ function TeamDetails() {
                   </p>
                 </div>
 
-                <div
+                {/* <div
                   className="
             rounded-2xl
             border border-white/10
@@ -866,7 +865,7 @@ function TeamDetails() {
                   <p className="mt-2 text-sm text-white/80">
                     {leader?.phone || "Not available"}
                   </p>
-                </div>
+                </div> */}
 
               </div>
 

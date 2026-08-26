@@ -158,7 +158,7 @@ function Signup() {
         </div>
 
         {/* content section */}
-        <section className="animate-[fadeIn_1s_ease-in-out] mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+        <section className="animate-[fadeIn_1s_ease-in-out] mt-8 flex flex-col justify-center gap-3 items-center">
           <form
             onSubmit={handleSubmit}
             className="
@@ -781,8 +781,8 @@ function Signup() {
               Go to SIH without login →
             </Link>
         </section>
-        
-        
+
+
 
       </section>
     </div>
