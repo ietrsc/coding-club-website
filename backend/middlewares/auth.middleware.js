@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 const authMiddleware = asyncHandler(
   async (req, res, next) => {
     const token =
-      req.cookies?.accessToken;
+      req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer","");
 
     if (!token) {
       throw new ApiError(

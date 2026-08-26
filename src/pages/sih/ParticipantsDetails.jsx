@@ -425,7 +425,7 @@ function ParticipantsDetails() {
               </div>
 
               <p className="mt-3 text-sm font-semibold text-white">
-                {participant.department || "—"}
+                {participant.department.toUpperCase() || "—"}
               </p>
             </div>
 
@@ -453,7 +453,7 @@ function ParticipantsDetails() {
               </div>
 
               <p className="mt-3 text-sm font-semibold text-white">
-                {participant.branch || "—"}
+                {participant.branch.toUpperCase() || "—"}
               </p>
             </div>
 
@@ -482,7 +482,7 @@ function ParticipantsDetails() {
 
               <p className="mt-3 text-sm font-semibold text-white">
                 {participant.year
-                  ? `${participant.year} Year`
+                  ? `${participant.year} YEAR`
                   : "—"}
               </p>
             </div>

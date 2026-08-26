@@ -4,6 +4,7 @@ import Team from "../models/Team.model.js";
 import {ApiError} from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
+import { updateTeamEligibility } from "../utils/teamEligibility.js";
 
 const sendTeamInvitation = asyncHandler(async (req, res) => {
   const { participantId } = req.body;
@@ -272,16 +273,17 @@ const acceptTeamInvitation = async (req, res) => {
     }
 
     // Add participant to team
-    team.members.push(participant._id);
-    await team.save();
+// Add participant to team
+team.members.push(participant._id);
 
-    // Update participant's team
-    participant.teamId = team._id;
-    await participant.save();
+// Update participant's team
+participant.teamId = team._id;
 
-    // Accept selected invitation
-    invitation.status = "accepted";
-    await invitation.save();
+// Recalculate eligibility now that membership changed
+await updateTeamEligibility(team);
+
+await team.save();
+await participant.save();
 
     // ==========================================
     // CLOSE ALL OTHER PENDING INVITATIONS

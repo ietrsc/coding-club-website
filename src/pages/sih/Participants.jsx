@@ -287,7 +287,7 @@ function Participants() {
                       </p>
 
                       <p className="mt-1 truncate text-sm font-semibold text-white">
-                        {participant.branch || "—"}
+                        {participant.branch.toUpperCase() || "—"}
                       </p>
                     </div>
 

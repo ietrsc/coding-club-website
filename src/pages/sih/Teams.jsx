@@ -180,7 +180,7 @@ function Teams() {
   const event = events.find((e) => e.slug === "sih-2026");
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-26">
 
       <div className="hidden md:block pointer-events-none">
         <GridAnimation />
