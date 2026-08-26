@@ -50,7 +50,7 @@ function Login() {
 
       if (!currentUser) {
         throw new Error(
-          "Login succeeded, but user session could not be loaded"
+          "Login succeeded, but user session could not be loaded, Please enable third party cookies on your browser and try again."
         );
       }
 
