@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { useSihAuth } from "../../context/SihAuthContext";
 import GridAnimation from "../../components/GridAnimation";
 import { events } from "../../data/event";
 
 function Signup() {
-
+  const { fetchCurrentUser } = useSihAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -102,15 +102,19 @@ function Signup() {
         );
       }
 
-      setSuccess(
-  "Account created successfully! Please verify your email."
-);
+      const currentUser = await fetchCurrentUser();
 
-navigate("/sih/verify-email", {
-  state: {
-    email: data.data.email,
-  },
-});
+      if (!currentUser) {
+        throw new Error(
+          "Account was created, but user session could not be loaded"
+        );
+      }
+
+      setSuccess("Account created successfully!");
+
+      setTimeout(() => {
+        navigate("/sih");
+      }, 1000);
     } catch (err) {
       setError(
         err.message || "Something went wrong"
@@ -123,7 +127,7 @@ navigate("/sih/verify-email", {
   const event = events.find((e) => e.slug === "sih-2026");
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-24 pb-26">
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
 
       <div className="hidden md:block pointer-events-none">
         <GridAnimation />
@@ -154,7 +158,7 @@ navigate("/sih/verify-email", {
         </div>
 
         {/* content section */}
-        <section className="animate-[fadeIn_1s_ease-in-out] mt-8 flex flex-col justify-center gap-3 items-center">
+        <section className="animate-[fadeIn_1s_ease-in-out] mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <form
             onSubmit={handleSubmit}
             className="
@@ -770,15 +774,7 @@ navigate("/sih/verify-email", {
 
             </div>
           </form>
-          <Link
-              to="/sih"
-              className="text-sm text-muted-foreground transition hover:text-primary text-center"
-            >
-              Go to SIH without login →
-            </Link>
         </section>
-
-
 
       </section>
     </div>

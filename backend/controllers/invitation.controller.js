@@ -1,11 +1,9 @@
 import TeamInvitation from "../models/TeamInvitation.model.js";
 import Participant from "../models/Participant.model.js";
 import Team from "../models/Team.model.js";
-import User from "../models/User.model.js";
 import {ApiError} from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
-import { updateTeamEligibility } from "../utils/teamEligibility.js";
 
 const sendTeamInvitation = asyncHandler(async (req, res) => {
   const { participantId } = req.body;
@@ -151,25 +149,11 @@ if (
   );
 }
 
-  // Find all verified users, so we only offer
-  // email-verified participants for invitation
-  const verifiedUsers = await User.find({
-    isEmailVerified: true,
-  }).select("participantId");
-
-  const verifiedParticipantIds = verifiedUsers.map(
-    (user) => user.participantId
-  );
-
-  // Find participants who don't belong to any team,
-  // exclude the leader themselves, and only include
-  // participants whose email has been verified
+  // Find participants who don't belong to any team
+  // and exclude the leader themselves
   const participants = await Participant.find({
     teamId: null,
-    _id: {
-      $ne: leaderParticipant._id,
-      $in: verifiedParticipantIds,
-    },
+    _id: { $ne: leaderParticipant._id },
   }).select(
     "name email phone gender department branch year skills"
   );
@@ -288,24 +272,21 @@ const acceptTeamInvitation = async (req, res) => {
     }
 
     // Add participant to team
-// Add participant to team
-team.members.push(participant._id);
+    team.members.push(participant._id);
+    await team.save();
 
-// Update participant's team
-participant.teamId = team._id;
+    // Update participant's team
+    participant.teamId = team._id;
+    await participant.save();
 
-// Recalculate eligibility now that membership changed
-await updateTeamEligibility(team);
-
-await team.save();
-await participant.save();
+    // Accept selected invitation
+    invitation.status = "accepted";
+    await invitation.save();
 
     // ==========================================
     // CLOSE ALL OTHER PENDING INVITATIONS
     // ==========================================
-invitation.status = "accepted";
 
-await invitation.save();
     await TeamInvitation.updateMany(
       {
         participantId: participant._id,
