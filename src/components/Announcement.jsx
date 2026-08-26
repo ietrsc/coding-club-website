@@ -62,6 +62,7 @@ function Announcement() {
             <div
               key={announcement.id}
               className="
+              mb-3
                 relative
                 overflow-hidden
                 rounded-2xl

@@ -1,5 +1,27 @@
 export const announcements = [
   {
+  id: 3,
+  badge: "IMPORTANT UPDATE",
+  title: "SIH Internal Hackathon 2026",
+  highlight: "Rulebook Released!",
+  description:
+    "The official rulebook for the SIH Internal Hackathon 2026 has been released. Go through the guidelines, rules, and important instructions before participating.",
+  link: "/events/sih-2026",
+  buttonText: "View Rulebook",
+  icon: "calendar",
+},
+  {
+  id: 2,
+  badge: "REGISTRATION OPEN",
+  title: "SIH Internal Hackathon 2026",
+  highlight: "Registration Has Started!",
+  description:
+    "Registrations for the SIH Internal Hackathon are now open. Register now to participate in the hackathon and get ready to build, collaborate, and compete.",
+  link: "/sih/signup",
+  buttonText: "Register Now",
+  icon: "calendar",
+},
+  {
     id: 1,
     badge: "IMPORTANT UPDATE",
     title: "SIH Internal Hackathon 2026",
