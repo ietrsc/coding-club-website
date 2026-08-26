@@ -257,6 +257,7 @@ function Navbar() {
               </Link>
 
               {/* User */}
+              <Link to={`/sih/participants/${user?.participantId._id}`}>
               <div
                 className="
           flex
@@ -288,6 +289,7 @@ function Navbar() {
                   {user?.participantId?.name || "Participant"}
                 </span>
               </div>
+              </Link>
 
               {/* Logout */}
               <button
@@ -439,9 +441,55 @@ function Navbar() {
 
         <div className={`${location.pathname.includes("/sih") ? isAuthenticated ? "flex" : "hidden" : ""
           } `}>
+            
 
           {isAuthenticated ? (
             <div className="flex justify-evenly items-center gap-3">
+              <Link
+                to="/sih/invitations"
+                className={`
+          relative
+          flex
+          items-center
+          gap-2
+          rounded-xl
+          border
+          px-4
+          py-2
+          text-sm
+          font-medium
+          transition-all
+          duration-300
+          ${location.pathname === "/sih/invitations"
+                    ? "border-primary/30 bg-primary/10 text-primary shadow-[0_0_18px_rgba(32,178,166,0.08)]"
+                    : "border-white/10 bg-white/5 text-white/60 hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                  }
+        `}
+              >
+                <span>Invitations</span>
+
+                {invitationCount > 0 && (
+                  <span
+                    className="
+              flex
+              h-5
+              min-w-5
+              items-center
+              justify-center
+              rounded-full
+              bg-primary
+              px-1
+              text-[10px]
+              font-bold
+              text-white
+              shadow-[0_0_12px_rgba(32,178,166,0.35)]
+            "
+                  >
+                    {invitationCount}
+                  </span>
+                )}
+              </Link>
+              <Link to={`/sih/participants/${user?.participantId?._id}`}>
               <span className="flex items-center gap-2 text-sm text-foreground">
                 <ParticipantAvatar
                   src={user?.participantId?.profileImage}
@@ -451,7 +499,7 @@ function Navbar() {
                   textClassName="text-xs font-semibold text-primary"
                 />
                 {user?.participantId?.name || "Participant"}
-              </span>
+              </span></Link>
 
               <button
                 type="button"

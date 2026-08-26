@@ -1294,7 +1294,7 @@ function TeamDetails() {
                             cursor-pointer
                           "
                           >
-                            Veiw Details
+                            View Details
                           </button>
                           <button
                             type="button"
