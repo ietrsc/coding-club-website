@@ -4,6 +4,8 @@ import Team from "../models/Team.model.js";
 import {ApiError} from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
+import { updateTeamEligibility } from "../utils/teamEligibility.js";
+
 
 const sendTeamInvitation = asyncHandler(async (req, res) => {
   const { participantId } = req.body;
@@ -273,15 +275,15 @@ const acceptTeamInvitation = async (req, res) => {
 
     // Add participant to team
     team.members.push(participant._id);
-    await team.save();
-
-    // Update participant's team
     participant.teamId = team._id;
-    await participant.save();
-
-    // Accept selected invitation
     invitation.status = "accepted";
+
+    await updateTeamEligibility(team);
+
+    await team.save();
+    await participant.save();
     await invitation.save();
+
 
     // ==========================================
     // CLOSE ALL OTHER PENDING INVITATIONS
