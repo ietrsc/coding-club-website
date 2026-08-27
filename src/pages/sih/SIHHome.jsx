@@ -30,11 +30,38 @@ function SIHHome() {
         {/* hero section */}
 
         <div className='flex flex-col items-center gap-2 '>
+
+          <div
+            className="
+    my-5
+    rounded-2xl
+    border
+    border-primary/40
+    p-1
+    shadow-[0_0_30px_rgba(32,178,166,0.25)]
+    transition-all
+    duration-300
+    hover:border-primary/70
+    hover:shadow-[0_0_40px_rgba(32,178,166,0.4)]
+  "
+          >
+            <img
+              src="../images/pragyanLogo.jpeg"
+              alt="Pragyan's Logo"
+              className="h-50 w-50 rounded-xl object-cover"
+            />
+          </div>
           <h1
-            className='text-4xl  md:text-6xl font-bold
-                  max-w-3xl z-3 md:text-center'
-          ><span className='bg-linear-to-r from-primary to-highlight text-transparent bg-clip-text'>{event.title}</span></h1>
-          <h2 className='mx-3 max-w-xs sm:max-w-2xl text-muted-foreground'>{event.shortDescription}</h2>
+            className='text-4xl  md:text-5xl font-bold
+                 z-3 text-center'
+          ><span className='bg-linear-to-r from-primary to-highlight text-transparent bg-clip-text'>PRAGYAN - The Coding Club of CSE</span></h1>
+          <h2 className='mx-3 max-w-120 sm:max-w-2xl text-muted-foreground text-center'>Department of Computer Science | Dr. Rammanohar Lohia Avadh University.</h2>
+          <a href='https:/cseiet.vercel.app' target='_blank' className='text-primary text-sm underline hover:scale-105 hover:text-blue-400 duration-200'>
+            Go to the official website of CSE clubs →
+          </a>
+          <a href="https://chat.whatsapp.com/LIxHxt2agoaCn5qbgoDvrA" target='_blank' className='text-primary hover:scale-105 hover:text-blue-400 duration-200 text-sm underline'>
+            Join CLUBS - Deptt of CSE →
+          </a>
 
         </div>
 
@@ -77,7 +104,7 @@ function SIHHome() {
             </h3>
 
             <p className="mt-3 text-sm sm:text-base leading-relaxed text-white/70">
-             You can create your own team and become the team leader, or browse existing teams and send a request to join one.
+              You can create your own team and become the team leader, or browse existing teams and send a request to join one.
             </p>
 
             {/* Important Note */}
@@ -87,20 +114,20 @@ function SIHHome() {
                   Important:
                 </span>{" "}
                 Incomplete teams can also register, but they will be eligible to
-  participate only after reaching the required team size. Team leaders can
-  invite individually registered students to join their team, while students
-  can also browse teams and request to join one.
+                participate only after reaching the required team size. Team leaders can
+                invite individually registered students to join their team, while students
+                can also browse teams and request to join one.
               </p>
             </div>
 
             {/* CTA */}
             <div className="mt-6">
               <Link
-              to="/sih/teams"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-primary bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
-            >
-              Explore Teams →
-            </Link>
+                to="/sih/teams"
+                className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-primary bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
+              >
+                Explore Teams →
+              </Link>
             </div>
           </div>
 
@@ -155,11 +182,11 @@ function SIHHome() {
             {/* CTA */}
             <div className="mt-6 flex justify-end">
               <Link
-              to="/sih/participants"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-primary bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
-            >
+                to="/sih/participants"
+                className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-primary bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
+              >
                 Explore Participants →
-            </Link>
+              </Link>
             </div>
           </div>
 

@@ -199,14 +199,39 @@ function Teams() {
 
         {/* hero section */}
 
-        <div className='flex flex-col items-center gap-2'>
+        <div className='flex flex-col items-center gap-2 '>
+
+          <div
+            className="
+    my-5
+    rounded-2xl
+    border
+    border-primary/40
+    p-1
+    shadow-[0_0_30px_rgba(32,178,166,0.25)]
+    transition-all
+    duration-300
+    hover:border-primary/70
+    hover:shadow-[0_0_40px_rgba(32,178,166,0.4)]
+  "
+          >
+            <img
+              src="../images/pragyanLogo.jpeg"
+              alt="Pragyan's Logo"
+              className="h-50 w-50 rounded-xl object-cover"
+            />
+          </div>
           <h1
-            className='text-4xl  md:text-6xl font-bold
-            max-w-3xl z-3 md:text-center'
-          ><span className='bg-linear-to-r from-primary to-highlight text-transparent bg-clip-text'>{event.title}</span></h1>
-          <h2 className='mx-3 max-w-xs sm:max-w-2xl text-muted-foreground'>Browse existing teams, view their members,
-            or request to join a team that matches
-            your interests.</h2>
+            className='text-4xl  md:text-5xl font-bold
+                 z-3 text-center'
+          ><span className='bg-linear-to-r from-primary to-highlight text-transparent bg-clip-text'>PRAGYAN - The Coding Club of CSE</span></h1>
+          <h2 className='mx-3 max-w-120 sm:max-w-2xl text-muted-foreground text-center'>Department of Computer Science | Dr. Rammanohar Lohia Avadh University.</h2>
+          <a href='https:/cseiet.vercel.app' target='_blank' className='text-primary text-sm underline hover:scale-105 hover:text-blue-400 duration-200'>
+            Go to the official website of CSE clubs →
+          </a>
+          <a href="https://chat.whatsapp.com/LIxHxt2agoaCn5qbgoDvrA" target='_blank' className='text-primary hover:scale-105 hover:text-blue-400 duration-200 text-sm underline'>
+            Join CLUBS - Deptt of CSE →
+          </a>
 
         </div>
 
@@ -577,7 +602,7 @@ function Teams() {
                             team._id?.toString() == userTeamId?.toString() ? () => navigate(`/sih/teams/${userTeamId}`) :
                               () => handleRequestClick(team._id)
                           }
-                          disabled={isFull}
+                          disabled={ !team._id?.toString() == userTeamId?.toString() && isFull}
                           className="
           flex-1
           rounded-xl
