@@ -108,11 +108,13 @@ function Login() {
             hover:shadow-[0_0_40px_rgba(32,178,166,0.4)]
           "
           >
-            <img
-              src="../images/pragyanLogo.jpeg"
-              alt="Pragyan's Logo"
-              className="h-50 w-50 rounded-xl object-cover"
-            />
+            <a href="https://chat.whatsapp.com/JoRVufRkjw2L1WMChubKs3" target="_blank" >
+              <img
+                src="../images/pragyanLogo.jpeg"
+                alt="Pragyan's Logo"
+                className="h-50 w-50 rounded-xl object-cover cursor-pointer"
+              />
+            </a>
           </div>
           <h1
             className='text-4xl  md:text-5xl font-bold
