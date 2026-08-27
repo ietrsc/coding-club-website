@@ -195,7 +195,7 @@ function Navbar() {
 
             {/* Members */}
 
-            <Link
+            {/* <Link
               to="/members"
               className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/members"
                 ? "bg-surface text-foreground"
@@ -203,7 +203,7 @@ function Navbar() {
                 }`}
             >
               Members
-            </Link>
+            </Link> */}
           </div>
         </div>
 
@@ -425,15 +425,22 @@ function Navbar() {
           Events
         </Link>
 
+        <Link
+              to="/sih"
+              className="w-full flex justify-center active:bg-primary/10 rounded-2xl h-8 items-center transition-all duration-100 ease-in-out z-10 text-foreground active:scale-150"
+            >
+              SIH
+            </Link>
+
         {/* Members */}
 
-        <Link
+        {/* <Link
           to="/members"
           onClick={() => setMenuOpen(false)}
           className="w-full flex justify-center active:bg-primary/10 rounded-2xl h-8 items-center transition-all duration-100 ease-in-out z-10 text-foreground active:scale-150"
         >
           Members
-        </Link>
+        </Link> */}
 
         {/* RMLAU Logo */}
 
@@ -451,9 +458,9 @@ function Navbar() {
 
         <div className={`${location.pathname.includes("/sih") ? isAuthenticated ? "flex" : "hidden" : ""
           } `}>
-            
 
-          {isAuthenticated ? (
+
+          {isAuthenticated && (
             <div className="flex justify-evenly items-center gap-3">
               <Link
                 to="/sih/invitations"
@@ -517,24 +524,6 @@ function Navbar() {
               >
                 Logout
               </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link
-                to="/sih/login"
-                onClick={() => setMenuOpen(false)}
-                className="text-sm transition hover:text-primary"
-              >
-                SIH Login
-              </Link>
-
-              <Link
-                to="/sih/signup"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white"
-              >
-                SIH Sign Up
-              </Link>
             </div>
           )}
 

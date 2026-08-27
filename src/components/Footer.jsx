@@ -1,7 +1,7 @@
 function Footer() {
   return (
     <footer
-      className='fixed mt-auto bottom-0 left-0 right-0 bg-linear-to-b from-background/60 to-black/60 text-center text-sm text-muted-foreground flex justify-between items-center h-22 sm:h-12 px-5 z-50 animate-[fadeIn_1s_ease-in-out]
+      className='fixed mt-auto bottom-0 left-0 right-0 bg-linear-to-b from-background/60 to-black/60 text-center text-sm text-muted-foreground flex justify-between items-center h-25 sm:h-12 px-5 z-50 animate-[fadeIn_1s_ease-in-out]
       mx-auto  max-w-6xl flex-col gap-4  py-4 sm:flex-row sm:justify-between sm:px-6 min-w-full'
     >
 
@@ -34,8 +34,8 @@ function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="text-center text-xs sm:text-sm">
-          © {new Date().getFullYear()} IET Students Community. All rights reserved.
+        <div className="text-center text-xs sm:text-sm ">
+          © {new Date().getFullYear()} IET Students Community. All rights reserved. |  Not an official entity or associate of the department of CSE.
         </div>
 
     </footer>
