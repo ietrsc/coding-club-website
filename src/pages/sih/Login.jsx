@@ -69,6 +69,7 @@ function Login() {
   };
 
   const event = events.find((e) => e.slug === "sih-2026");
+  let [forgot, setForgot] = useState('false');
 
   return (
     <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
@@ -249,7 +250,29 @@ function Login() {
           focus:ring-primary/10
         "
                 />
+                <p className="mt-3 text-xs text-right text-primary cursor-pointer hover:scale-105 hover:text-highlight duration-200" onClick={() => setForgot('true')}>Forgot password</p>
               </div>
+
+
+              {/* Forgot password */}
+              {forgot === 'true' ? (
+                <div
+                  className="
+          mt-5
+          rounded-xl
+          border border-red-400/20
+          bg-red-400/5
+          px-4
+          py-3
+          text-sm
+          leading-relaxed
+          text-red-400
+        "
+                >
+                  Please ask the admin at 6306837650 to delete your account, then sign up again.
+                </div>
+              ) : ""}
+
 
               {/* Error */}
               {error && (
