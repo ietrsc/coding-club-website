@@ -1,6 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Mail, UserRound, GraduationCap, Code2 } from "lucide-react";
+import {
+  Link,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+
+import {
+  ArrowLeft,
+  Mail,
+  UserRound,
+  GraduationCap,
+  Code2,
+  Pencil,
+  X,
+} from "lucide-react";
+
 import GridAnimation from "../../components/GridAnimation";
 import ParticipantAvatar from "../../components/ParticipantAvatar";
 import { useSihAuth } from "../../context/SihAuthContext";
@@ -14,6 +28,10 @@ function ParticipantsDetails() {
     isAuthenticated,
   } = useSihAuth();
 
+  // ==========================================
+  // CURRENT USER
+  // ==========================================
+
   const userParticipantId =
     user?.participantId?._id ||
     user?.participantId;
@@ -25,17 +43,84 @@ function ParticipantsDetails() {
   const isTeamLeader =
     Boolean(userParticipantId) &&
     Boolean(teamLeaderId) &&
-    userParticipantId.toString() === teamLeaderId.toString();
+    userParticipantId.toString() ===
+      teamLeaderId.toString();
 
-  const [participant, setParticipant] = useState(null);
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const isOwnProfile =
+    isAuthenticated &&
+    Boolean(userParticipantId) &&
+    Boolean(participantId) &&
+    userParticipantId.toString() ===
+      participantId.toString();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // ==========================================
+  // PARTICIPANT STATE
+  // ==========================================
 
-  const [sendingInvitation, setSendingInvitation] = useState(false);
-  const [inviteMessage, setInviteMessage] = useState("");
-  const [inviteError, setInviteError] = useState("");
+  const [participant, setParticipant] =
+    useState(null);
+
+  const [selectedAvatar, setSelectedAvatar] =
+    useState(null);
+
+  // ==========================================
+  // LOADING / ERROR
+  // ==========================================
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  // ==========================================
+  // INVITATION STATE
+  // ==========================================
+
+  const [
+    sendingInvitation,
+    setSendingInvitation,
+  ] = useState(false);
+
+  const [inviteMessage, setInviteMessage] =
+    useState("");
+
+  const [inviteError, setInviteError] =
+    useState("");
+
+  // ==========================================
+  // EDIT STATE
+  // ==========================================
+
+  const [editing, setEditing] =
+    useState(false);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [editError, setEditError] =
+    useState("");
+
+  const [editSuccess, setEditSuccess] =
+    useState("");
+
+  const [editForm, setEditForm] =
+    useState({
+      name: "",
+      department: "",
+      branch: "",
+      skills: "",
+    });
+
+  const [
+    editProfileImage,
+    setEditProfileImage,
+  ] = useState(null);
+
+  const [
+    editProfileImagePreview,
+    setEditProfileImagePreview,
+  ] = useState("");
 
   // ==========================================
   // FETCH PARTICIPANT
@@ -54,25 +139,32 @@ function ParticipantsDetails() {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Failed to fetch participants"
+          data.message ||
+            "Failed to fetch participants"
         );
       }
 
-      const participants = data.data || data;
+      const participants =
+        data.data || data;
 
-      const foundParticipant = participants.find(
-        (participant) =>
-          participant._id?.toString() === participantId
-      );
+      const foundParticipant =
+        participants.find(
+          (participant) =>
+            participant._id?.toString() ===
+            participantId
+        );
 
       if (!foundParticipant) {
-        throw new Error("Participant not found");
+        throw new Error(
+          "Participant not found"
+        );
       }
 
       setParticipant(foundParticipant);
     } catch (err) {
       setError(
-        err.message || "Something went wrong"
+        err.message ||
+          "Something went wrong"
       );
     } finally {
       setLoading(false);
@@ -86,59 +178,345 @@ function ParticipantsDetails() {
   }, [participantId]);
 
   // ==========================================
-  // INVITE PARTICIPANT
+  // OPEN EDIT MODE
   // ==========================================
 
-  const handleSendInvitation = async () => {
-    if (!isAuthenticated) {
-      navigate("/sih/login");
+  const openEditProfile = () => {
+    if (!participant || !isOwnProfile) {
       return;
     }
 
-    if (!participant?._id) return;
+    setEditForm({
+      name: participant.name || "",
+      department:
+        participant.department || "",
+      branch: participant.branch || "",
+      skills:
+        participant.skills?.join(", ") || "",
+    });
 
-    try {
-      setSendingInvitation(true);
-      setInviteMessage("");
-      setInviteError("");
+    setEditProfileImage(null);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/invitations/invite`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            participantId: participant._id,
-          }),
-        }
+    setEditProfileImagePreview(
+      participant.profileImage || ""
+    );
+
+    setEditError("");
+    setEditSuccess("");
+    setEditing(true);
+  };
+
+  // ==========================================
+  // CLOSE EDIT MODE
+  // ==========================================
+
+  const closeEditProfile = () => {
+    if (saving) return;
+
+    setEditing(false);
+    setEditError("");
+    setEditSuccess("");
+    setEditProfileImage(null);
+    setEditProfileImagePreview("");
+  };
+
+  // ==========================================
+  // EDIT FORM CHANGE
+  // ==========================================
+
+  const handleEditChange = (event) => {
+    const {
+      name,
+      value,
+    } = event.target;
+
+    setEditForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  // ==========================================
+  // PROFILE IMAGE CHANGE
+  // ==========================================
+
+  const handleEditProfileImageChange =
+    (event) => {
+      const file =
+        event.target.files?.[0] || null;
+
+      setEditError("");
+      setEditSuccess("");
+
+      if (!file) {
+        setEditProfileImage(null);
+
+        setEditProfileImagePreview(
+          participant?.profileImage || ""
+        );
+
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        setEditError(
+          "Please select a valid image."
+        );
+
+        event.target.value = "";
+        return;
+      }
+
+      if (
+        file.size >
+        5 * 1024 * 1024
+      ) {
+        setEditError(
+          "Profile picture must be smaller than 5 MB."
+        );
+
+        event.target.value = "";
+        return;
+      }
+
+      setEditProfileImage(file);
+
+      setEditProfileImagePreview(
+        URL.createObjectURL(file)
+      );
+    };
+
+  // ==========================================
+  // SAVE PROFILE
+  // ==========================================
+
+  const handleSaveProfile = async (
+    event
+  ) => {
+    event.preventDefault();
+
+    if (!isOwnProfile) {
+      setEditError(
+        "You can only edit your own profile."
       );
 
-      const data = await response.json();
+      return;
+    }
 
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to send invitation"
+    if (!editForm.name.trim()) {
+      setEditError(
+        "Name is required."
+      );
+
+      return;
+    }
+
+    if (!editForm.department.trim()) {
+      setEditError(
+        "Department is required."
+      );
+
+      return;
+    }
+
+    if (!editForm.branch.trim()) {
+      setEditError(
+        "Branch is required."
+      );
+
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setEditError("");
+      setEditSuccess("");
+
+      const formData = new FormData();
+
+      formData.append(
+        "name",
+        editForm.name.trim()
+      );
+
+      formData.append(
+        "department",
+        editForm.department.trim()
+      );
+
+      formData.append(
+        "branch",
+        editForm.branch.trim()
+      );
+
+      const skills = editForm.skills
+        ? editForm.skills
+            .split(",")
+            .map((skill) =>
+              skill.trim()
+            )
+            .filter(Boolean)
+        : [];
+
+      skills.forEach((skill) => {
+        formData.append(
+          "skills[]",
+          skill
+        );
+      });
+
+      if (editProfileImage) {
+        formData.append(
+          "profileImage",
+          editProfileImage
         );
       }
 
-      setInviteMessage(
-        data.message || "Invitation sent successfully!"
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/participants/profile`,
+        {
+          method: "PUT",
+          credentials: "include",
+          body: formData,
+        }
       );
 
-      window.dispatchEvent(
-        new CustomEvent("sih-invitations-changed")
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Failed to update profile"
+        );
+      }
+
+      const updatedParticipant =
+        data.data?.participant ||
+        data.data ||
+        data;
+
+      // Update page immediately
+      setParticipant(
+        updatedParticipant
       );
+
+      // Reset edit form from saved data
+      setEditForm({
+        name:
+          updatedParticipant.name ||
+          "",
+        department:
+          updatedParticipant.department ||
+          "",
+        branch:
+          updatedParticipant.branch ||
+          "",
+        skills:
+          updatedParticipant.skills?.join(
+            ", "
+          ) || "",
+      });
+
+      setEditProfileImage(null);
+
+      setEditProfileImagePreview(
+        updatedParticipant.profileImage ||
+          ""
+      );
+
+      setEditSuccess(
+        "Profile updated successfully!"
+      );
+
+      // Close modal shortly after success
+      setTimeout(() => {
+        setEditing(false);
+        setEditSuccess("");
+      }, 1000);
     } catch (err) {
-      setInviteError(
-        err.message || "Failed to send invitation"
+      console.error(
+        "Update profile error:",
+        err
+      );
+
+      setEditError(
+        err.message ||
+          "Failed to update profile"
       );
     } finally {
-      setSendingInvitation(false);
+      setSaving(false);
     }
   };
+
+  // ==========================================
+  // INVITE PARTICIPANT
+  // ==========================================
+
+  const handleSendInvitation =
+    async () => {
+      if (!isAuthenticated) {
+        navigate("/sih/login");
+        return;
+      }
+
+      if (!participant?._id) {
+        return;
+      }
+
+      try {
+        setSendingInvitation(true);
+        setInviteMessage("");
+        setInviteError("");
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/invitations/invite`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            credentials: "include",
+
+            body: JSON.stringify({
+              participantId:
+                participant._id,
+            }),
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Failed to send invitation"
+          );
+        }
+
+        setInviteMessage(
+          data.message ||
+            "Invitation sent successfully!"
+        );
+
+        window.dispatchEvent(
+          new CustomEvent(
+            "sih-invitations-changed"
+          )
+        );
+      } catch (err) {
+        setInviteError(
+          err.message ||
+            "Failed to send invitation"
+        );
+      } finally {
+        setSendingInvitation(false);
+      }
+    };
 
   // ==========================================
   // LOADING
@@ -147,7 +525,6 @@ function ParticipantsDetails() {
   if (loading) {
     return (
       <div className="relative min-h-screen overflow-hidden pt-24">
-
         <div className="pointer-events-none fixed inset-0 z-0">
           <GridAnimation />
 
@@ -159,7 +536,6 @@ function ParticipantsDetails() {
             Loading participant...
           </div>
         </div>
-
       </div>
     );
   }
@@ -171,22 +547,20 @@ function ParticipantsDetails() {
   if (error || !participant) {
     return (
       <div className="relative min-h-screen overflow-hidden px-4 pb-20 pt-24">
-
         <div className="pointer-events-none fixed inset-0 z-0">
           <GridAnimation />
+
           <div className="absolute inset-0 bg-black/60" />
         </div>
 
         <div className="relative z-10 mx-auto flex min-h-[70vh] max-w-md items-center justify-center">
-
           <div className="w-full rounded-3xl border border-red-400/20 bg-red-400/5 p-8 text-center backdrop-blur-md">
-
             <h2 className="text-xl font-bold text-red-400">
               Participant not found
             </h2>
 
             <p className="mt-3 text-sm leading-relaxed text-white/50">
-              {"Unable to load this participant."}
+              Unable to load this participant.
             </p>
 
             <Link
@@ -214,9 +588,7 @@ function ParticipantsDetails() {
               <ArrowLeft className="h-4 w-4" />
               Back to Participants
             </Link>
-
           </div>
-
         </div>
       </div>
     );
@@ -224,27 +596,28 @@ function ParticipantsDetails() {
 
   return (
     <div className="relative min-h-screen overflow-hidden px-4 pb-24 pt-24 sm:px-6">
-
-      <div className="hidden md:block pointer-events-none">
+      <div className="hidden pointer-events-none md:block">
         <GridAnimation />
       </div>
 
-      {/* backgroundImage*/}
+      {/* Background */}
       <div
-        className="fixed inset-0 bg-cover bg-center z-0 bg-no-repeat pointer-events-none"
-        style={{ backgroundImage: `url('../../images/backgroundImg.png')` }}
-      ></div>
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+        style={{
+          backgroundImage:
+            `url('../../images/backgroundImg.png')`,
+        }}
+      />
 
-      {/*overlay layer*/}
-      <div className='fixed inset-0 bg-linear-to-b from-black/70 to-black/80 '></div>
-
-      {/* ==========================================
-          PAGE
-      ========================================== */}
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-linear-to-b from-black/70 to-black/80" />
 
       <section className="relative z-10 mx-auto w-full max-w-5xl">
 
-        {/* Back */}
+        {/* ==========================================
+            BACK
+        =========================================== */}
+
         <Link
           to="/sih/participants"
           className="
@@ -265,7 +638,7 @@ function ParticipantsDetails() {
 
         {/* ==========================================
             PROFILE HERO
-        ========================================== */}
+        =========================================== */}
 
         <div
           className="
@@ -280,14 +653,12 @@ function ParticipantsDetails() {
             via-white/5
             to-transparent
             p-8
-            sm:p-10
-            lg:p-12
             backdrop-blur-xl
             shadow-[0_0_60px_rgba(32,178,166,0.10)]
+            sm:p-10
+            lg:p-12
           "
         >
-
-          {/* Glow */}
           <div
             className="
               pointer-events-none
@@ -305,15 +676,55 @@ function ParticipantsDetails() {
 
           <div className="relative z-10 flex flex-col items-center text-center">
 
+            {/* Edit Button */}
+
+            {isOwnProfile && (
+              <button
+                type="button"
+                onClick={openEditProfile}
+                className="
+                  absolute
+                  right-0
+                  top-0
+                  inline-flex
+                  items-center
+                  gap-2
+                  rounded-xl
+                  border
+                  border-primary/25
+                  bg-primary/10
+                  px-4
+                  py-2.5
+                  text-sm
+                  font-semibold
+                  text-primary
+                  transition-all
+                  duration-300
+                  hover:border-primary/50
+                  hover:bg-primary/20
+                "
+              >
+                <Pencil className="h-4 w-4" />
+                Edit Profile
+              </button>
+            )}
+
             {/* Avatar */}
+
             <button
               type="button"
-              disabled={!participant.profileImage}
+              disabled={
+                !participant.profileImage
+              }
               onClick={() => {
-                if (participant.profileImage) {
+                if (
+                  participant.profileImage
+                ) {
                   setSelectedAvatar({
-                    src: participant.profileImage,
-                    name: participant.name,
+                    src:
+                      participant.profileImage,
+                    name:
+                      participant.name,
                   });
                 }
               }}
@@ -367,7 +778,6 @@ function ParticipantsDetails() {
                     transition-opacity
                     duration-300
                     group-hover/avatar:opacity-100
-                    cursor-pointer
                   "
                 >
                   View Photo
@@ -376,6 +786,7 @@ function ParticipantsDetails() {
             </button>
 
             {/* Name */}
+
             <h1 className="mt-6 text-3xl font-bold text-white sm:text-4xl">
               {participant.name}
             </h1>
@@ -385,7 +796,7 @@ function ParticipantsDetails() {
 
         {/* ==========================================
             ACADEMIC INFORMATION
-        ========================================== */}
+        =========================================== */}
 
         <section className="mt-12">
 
@@ -402,6 +813,7 @@ function ParticipantsDetails() {
           <div className="grid gap-4 sm:grid-cols-3">
 
             {/* Department */}
+
             <div
               className="
                 rounded-2xl
@@ -425,11 +837,13 @@ function ParticipantsDetails() {
               </div>
 
               <p className="mt-3 text-sm font-semibold text-white">
-                {participant.department.toUpperCase() || "—"}
+                {participant.department?.toUpperCase() ||
+                  "—"}
               </p>
             </div>
 
             {/* Branch */}
+
             <div
               className="
                 rounded-2xl
@@ -453,11 +867,13 @@ function ParticipantsDetails() {
               </div>
 
               <p className="mt-3 text-sm font-semibold text-white">
-                {participant.branch.toUpperCase() || "—"}
+                {participant.branch?.toUpperCase() ||
+                  "—"}
               </p>
             </div>
 
             {/* Year */}
+
             <div
               className="
                 rounded-2xl
@@ -492,7 +908,7 @@ function ParticipantsDetails() {
 
         {/* ==========================================
             SKILLS
-        ========================================== */}
+        =========================================== */}
 
         <section className="mt-10">
 
@@ -516,30 +932,33 @@ function ParticipantsDetails() {
               backdrop-blur-md
             "
           >
-            {participant.skills?.length > 0 ? (
+            {participant.skills?.length >
+            0 ? (
               <div className="flex flex-wrap gap-2.5">
-                {participant.skills.map((skill, index) => (
-                  <span
-                    key={`${participant._id}-${index}`}
-                    className="
-                      rounded-full
-                      border
-                      border-primary/20
-                      bg-primary/5
-                      px-4
-                      py-2
-                      text-sm
-                      font-medium
-                      text-primary
-                      transition-all
-                      duration-300
-                      hover:border-primary/40
-                      hover:bg-primary/10
-                    "
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {participant.skills.map(
+                  (skill, index) => (
+                    <span
+                      key={`${participant._id}-${index}`}
+                      className="
+                        rounded-full
+                        border
+                        border-primary/20
+                        bg-primary/5
+                        px-4
+                        py-2
+                        text-sm
+                        font-medium
+                        text-primary
+                        transition-all
+                        duration-300
+                        hover:border-primary/40
+                        hover:bg-primary/10
+                      "
+                    >
+                      {skill}
+                    </span>
+                  )
+                )}
               </div>
             ) : (
               <p className="text-sm text-white/40">
@@ -547,12 +966,11 @@ function ParticipantsDetails() {
               </p>
             )}
           </div>
-
         </section>
 
         {/* ==========================================
             CONTACT
-        ========================================== */}
+        =========================================== */}
 
         <section className="mt-10">
 
@@ -601,18 +1019,18 @@ function ParticipantsDetails() {
                 </p>
 
                 <p className="mt-2 break-all text-sm font-medium text-white/80">
-                  {participant.email || "Not available"}
+                  {participant.email ||
+                    "Not available"}
                 </p>
               </div>
 
             </div>
           </div>
-
         </section>
 
         {/* ==========================================
             MESSAGES
-        ========================================== */}
+        =========================================== */}
 
         {inviteMessage && (
           <div
@@ -650,54 +1068,56 @@ function ParticipantsDetails() {
               text-red-400
             "
           >
-            {inviteError || "Something went wrong."}
+            {inviteError}
           </div>
         )}
 
-
         {/* ==========================================
-            CTA
-        ========================================== */}
+            INVITATION CTA
+        =========================================== */}
 
-        {isAuthenticated && isTeamLeader && (
-          <section className="mt-10">
-
-            <button
-              type="button"
-              onClick={handleSendInvitation}
-              disabled={sendingInvitation}
-              className={`
-                w-full
-                rounded-2xl
-                bg-primary
-                px-6
-                py-4
-                text-sm
-                font-bold
-                text-white
-                shadow-[0_0_25px_rgba(32,178,166,0.18)]
-                transition-all
-                duration-300
-                hover:-translate-y-1
-                hover:bg-primary2
-                hover:shadow-[0_0_35px_rgba(32,178,166,0.3)]
-                active:scale-[0.98]
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-                cursor-pointer
-              `}
-            >
-              {sendingInvitation
-                ? "Sending Invitation..."
-                : "Invite to Join Team →"}
-            </button>
-
-          </section>
-        )}
+        {isAuthenticated &&
+          isTeamLeader &&
+          !isOwnProfile && (
+            <section className="mt-10">
+              <button
+                type="button"
+                onClick={
+                  handleSendInvitation
+                }
+                disabled={
+                  sendingInvitation
+                }
+                className="
+                  w-full
+                  rounded-2xl
+                  bg-primary
+                  px-6
+                  py-4
+                  text-sm
+                  font-bold
+                  text-white
+                  shadow-[0_0_25px_rgba(32,178,166,0.18)]
+                  transition-all
+                  duration-300
+                  hover:-translate-y-1
+                  hover:bg-primary2
+                  hover:shadow-[0_0_35px_rgba(32,178,166,0.3)]
+                  active:scale-[0.98]
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
+                "
+              >
+                {sendingInvitation
+                  ? "Sending Invitation..."
+                  : "Invite to Join Team →"}
+              </button>
+            </section>
+          )}
 
         {/* ==========================================
             BACK
-        ========================================== */}
+        =========================================== */}
 
         <div className="mt-8 text-center">
           <Link
@@ -718,7 +1138,7 @@ function ParticipantsDetails() {
 
       {/* ==========================================
           LARGE AVATAR VIEWER
-      ========================================== */}
+      =========================================== */}
 
       {selectedAvatar && (
         <div
@@ -733,17 +1153,21 @@ function ParticipantsDetails() {
             p-4
             backdrop-blur-md
           "
-          onClick={() => setSelectedAvatar(null)}
+          onClick={() =>
+            setSelectedAvatar(null)
+          }
         >
           <div
             className="relative flex max-h-[95vh] max-w-[95vw] flex-col items-center"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event) =>
+              event.stopPropagation()
+            }
           >
-
-            {/* Close */}
             <button
               type="button"
-              onClick={() => setSelectedAvatar(null)}
+              onClick={() =>
+                setSelectedAvatar(null)
+              }
               className="
                 absolute
                 -right-3
@@ -768,7 +1192,6 @@ function ParticipantsDetails() {
               ×
             </button>
 
-            {/* Image */}
             <img
               src={selectedAvatar.src}
               alt={selectedAvatar.name}
@@ -786,7 +1209,397 @@ function ParticipantsDetails() {
             <p className="mt-4 text-center text-sm font-semibold text-white/80">
               {selectedAvatar.name}
             </p>
+          </div>
+        </div>
+      )}
 
+      {/* ==========================================
+          EDIT PROFILE MODAL
+      =========================================== */}
+
+      {editing && (
+        <div
+          className="
+            fixed
+            inset-0
+            z-[200]
+            flex
+            items-center
+            justify-center
+            bg-black/80
+            px-4
+            py-6
+            backdrop-blur-md
+          "
+        >
+          <div
+            className="
+              relative
+              max-h-[90vh]
+              w-full
+              max-w-2xl
+              overflow-y-auto
+              rounded-3xl
+              border
+              border-primary/20
+              bg-[#101616]
+              p-6
+              shadow-[0_0_60px_rgba(32,178,166,0.15)]
+              sm:p-8
+            "
+          >
+            {/* Modal header */}
+
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                  Profile Settings
+                </p>
+
+                <h2 className="mt-1 text-2xl font-bold text-white">
+                  Edit Profile
+                </h2>
+
+                <p className="mt-1 text-sm text-white/40">
+                  Update your participant details.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeEditProfile}
+                disabled={saving}
+                className="
+                  flex
+                  h-10
+                  w-10
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/10
+                  bg-white/5
+                  text-white/60
+                  transition
+                  hover:bg-white/10
+                  hover:text-white
+                  disabled:opacity-50
+                "
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleSaveProfile}
+              className="mt-8"
+            >
+
+              {/* Profile picture */}
+
+              <div className="flex flex-col items-center">
+                <ParticipantAvatar
+                  src={
+                    editProfileImagePreview
+                  }
+                  name={
+                    editForm.name
+                  }
+                  size="h-28 w-28"
+                  className="
+                    rounded-full
+                    border-2
+                    border-primary
+                  "
+                  textClassName="text-3xl font-bold text-primary"
+                />
+
+                <label
+                  className="
+                    mt-4
+                    cursor-pointer
+                    rounded-xl
+                    border
+                    border-primary/25
+                    bg-primary/5
+                    px-4
+                    py-2.5
+                    text-sm
+                    font-semibold
+                    text-primary
+                    transition
+                    hover:border-primary/50
+                    hover:bg-primary/10
+                  "
+                >
+                  Change Profile Picture
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={
+                      handleEditProfileImageChange
+                    }
+                    disabled={saving}
+                    className="hidden"
+                  />
+                </label>
+
+                <p className="mt-2 text-xs text-white/30">
+                  JPG or PNG, maximum 5MB.
+                </p>
+              </div>
+
+              {/* Fields */}
+
+              <div className="mt-8 grid gap-5 sm:grid-cols-2">
+
+                {/* Name */}
+
+                <div className="sm:col-span-2">
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Full Name
+                  </label>
+
+                  <input
+                    type="text"
+                    name="name"
+                    value={editForm.name}
+                    onChange={
+                      handleEditChange
+                    }
+                    disabled={saving}
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-white/10
+                      bg-black/20
+                      px-4
+                      py-3
+                      text-sm
+                      text-white
+                      outline-none
+                      transition
+                      focus:border-primary/60
+                      focus:ring-2
+                      focus:ring-primary/10
+                      disabled:opacity-50
+                    "
+                  />
+                </div>
+
+                {/* Department */}
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Department
+                  </label>
+
+                  <input
+                    type="text"
+                    name="department"
+                    value={
+                      editForm.department
+                    }
+                    onChange={
+                      handleEditChange
+                    }
+                    disabled={saving}
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-white/10
+                      bg-black/20
+                      px-4
+                      py-3
+                      text-sm
+                      text-white
+                      outline-none
+                      transition
+                      focus:border-primary/60
+                      focus:ring-2
+                      focus:ring-primary/10
+                      disabled:opacity-50
+                    "
+                  />
+                </div>
+
+                {/* Branch */}
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Branch
+                  </label>
+
+                  <input
+                    type="text"
+                    name="branch"
+                    value={editForm.branch}
+                    onChange={
+                      handleEditChange
+                    }
+                    disabled={saving}
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-white/10
+                      bg-black/20
+                      px-4
+                      py-3
+                      text-sm
+                      text-white
+                      outline-none
+                      transition
+                      focus:border-primary/60
+                      focus:ring-2
+                      focus:ring-primary/10
+                      disabled:opacity-50
+                    "
+                  />
+                </div>
+
+                {/* Skills */}
+
+                <div className="sm:col-span-2">
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Skills
+                  </label>
+
+                  <input
+                    type="text"
+                    name="skills"
+                    value={editForm.skills}
+                    onChange={
+                      handleEditChange
+                    }
+                    disabled={saving}
+                    placeholder="React, Node.js, Python..."
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-white/10
+                      bg-black/20
+                      px-4
+                      py-3
+                      text-sm
+                      text-white
+                      placeholder:text-white/25
+                      outline-none
+                      transition
+                      focus:border-primary/60
+                      focus:ring-2
+                      focus:ring-primary/10
+                      disabled:opacity-50
+                    "
+                  />
+
+                  <p className="mt-2 text-xs text-white/30">
+                    Separate multiple skills with commas.
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Error */}
+
+              {editError && (
+                <div
+                  className="
+                    mt-5
+                    rounded-xl
+                    border
+                    border-red-400/20
+                    bg-red-400/5
+                    px-4
+                    py-3
+                    text-sm
+                    text-red-400
+                  "
+                >
+                  {editError}
+                </div>
+              )}
+
+              {/* Success */}
+
+              {editSuccess && (
+                <div
+                  className="
+                    mt-5
+                    rounded-xl
+                    border
+                    border-green-400/20
+                    bg-green-400/5
+                    px-4
+                    py-3
+                    text-sm
+                    text-green-400
+                  "
+                >
+                  {editSuccess}
+                </div>
+              )}
+
+              {/* Buttons */}
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-end">
+
+                <button
+                  type="button"
+                  onClick={
+                    closeEditProfile
+                  }
+                  disabled={saving}
+                  className="
+                    rounded-xl
+                    border
+                    border-white/10
+                    bg-white/5
+                    px-5
+                    py-3
+                    text-sm
+                    font-semibold
+                    text-white/70
+                    transition
+                    hover:bg-white/10
+                    hover:text-white
+                    disabled:opacity-50
+                  "
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="
+                    rounded-xl
+                    bg-primary
+                    px-6
+                    py-3
+                    text-sm
+                    font-semibold
+                    text-white
+                    transition
+                    hover:-translate-y-0.5
+                    hover:bg-primary2
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+                >
+                  {saving
+                    ? "Saving Changes..."
+                    : "Save Changes"}
+                </button>
+
+              </div>
+
+            </form>
           </div>
         </div>
       )}
