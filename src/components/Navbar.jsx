@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useSihAuth } from "../context/SihAuthContext";
@@ -119,6 +119,14 @@ function Navbar() {
     isAuthenticated,
     user?._id,
   ]);
+
+  const userTeamId =
+    user?.participantId?.teamId?._id ||
+    user?.participantId?.teamId;
+
+  const userParticipantId =
+    user?.participantId?._id ||
+    user?.participantId;
 
   return (
     <header
@@ -270,6 +278,10 @@ function Navbar() {
 
               {/* User */}
               <div
+                onClick={
+                  userTeamId ? () => navigate(`/sih/teams/${userTeamId}`) :
+                  ()  => navigate(`/sih/participants/${userParticipantId}`)
+                }
                 className="
           flex
           items-center
@@ -281,6 +293,10 @@ function Navbar() {
           px-3
           py-1.5
           backdrop-blur-md
+          cursor-pointer
+          hover:bg-primary/10
+          hover:border-primary/30
+          group
         "
               >
                 <ParticipantAvatar
@@ -293,10 +309,10 @@ function Navbar() {
             border-primary/20
             bg-primary/10
           "
-                  textClassName="text-xs font-semibold text-primary"
+                  textClassName="text-xs font-semibold text-primary "
                 />
 
-                <span className="max-w-32 truncate text-sm font-medium text-white/70">
+                <span className="max-w-32 truncate text-sm font-medium text-white/70 group-hover:text-primary">
                   {user?.participantId?.name || "Participant"}
                 </span>
               </div>
@@ -327,56 +343,7 @@ function Navbar() {
                 <LogOut className="h-4 w-4" />
               </button>
             </>
-          ) : (
-            <>
-              {/* SIH Login */}
-              <Link
-                to="/sih/login"
-                className="
-          rounded-xl
-          border
-          border-white/10
-          bg-white/5
-          px-4
-          py-2
-          text-sm
-          font-medium
-          text-white/65
-          transition-all
-          duration-300
-          hover:border-primary/30
-          hover:bg-primary/5
-          hover:text-primary
-        "
-              >
-                SIH Login
-              </Link>
-
-              {/* SIH Sign Up */}
-              <Link
-                to="/sih/signup"
-                className="
-          rounded-xl
-          border
-          border-primary
-          bg-primary/10
-          px-4
-          py-2
-          text-sm
-          font-semibold
-          text-white
-          shadow-[0_0_18px_rgba(32,178,166,0.12)]
-          transition-all
-          duration-300
-          hover:bg-primary
-          hover:shadow-[0_0_28px_rgba(32,178,166,0.25)]
-          active:scale-95
-        "
-              >
-                SIH Sign Up
-              </Link>
-            </>
-          )}
+          ) : ""}
         </div>
 
         {/* ========================================
@@ -508,10 +475,11 @@ function Navbar() {
               </Link>
               <span className="flex items-center gap-2 text-sm text-foreground">
                 <ParticipantAvatar
+                  onClick = {() => navigate(`/sih/participants/${user?.participantId}`)}
                   src={user?.participantId?.profileImage}
                   name={user?.participantId?.name}
                   size="h-7 w-7"
-                  className="rounded-full bg-primary/10"
+                  className="rounded-full bg-primary/10 cursor-pointer"
                   textClassName="text-xs font-semibold text-primary"
                 />
                 {user?.participantId?.name || "Participant"}

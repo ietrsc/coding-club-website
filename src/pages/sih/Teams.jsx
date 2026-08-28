@@ -336,6 +336,7 @@ function Teams() {
 
               {teams.map((team) => {
 
+
                 const regularMemberCount = team.members?.length || 0;
 
                 // Leader + regular members
@@ -604,7 +605,7 @@ function Teams() {
                             team._id?.toString() == userTeamId?.toString() ? () => navigate(`/sih/teams/${userTeamId}`) :
                               () => handleRequestClick(team._id)
                           }
-                          disabled={ !team._id?.toString() == userTeamId?.toString() && isFull}
+                          disabled={isFull}
                           className="
           flex-1
           rounded-xl
@@ -627,8 +628,7 @@ function Teams() {
         "
                         >
                           {
-                            team._id?.toString() == userTeamId?.toString() ? "View your team →" :
-                              isFull ? "Team Full" : "Request to Join →"
+                            isFull ? "Team Full" : "Request to Join →"
                           }
                         </button>
                       ) : (
