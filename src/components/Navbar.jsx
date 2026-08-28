@@ -473,7 +473,10 @@ function Navbar() {
                   </span>
                 )}
               </Link>
-              <span className="flex items-center gap-2 text-sm text-foreground">
+              <span onClick={
+                  userTeamId ? () => navigate(`/sih/teams/${userTeamId}`) :
+                  ()  => navigate(`/sih/participants/${userParticipantId}`)
+                } className="flex items-center gap-2 text-sm text-foreground">
                 <ParticipantAvatar
                   onClick = {() => navigate(`/sih/participants/${user?.participantId}`)}
                   src={user?.participantId?.profileImage}
