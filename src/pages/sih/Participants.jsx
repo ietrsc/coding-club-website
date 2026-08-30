@@ -302,7 +302,7 @@ function Participants() {
                 >
 
                   {/* Name */}
-                  <h2 className=" text-xl font-bold text-white">
+                  <h2 className=" text-xl font-bold text-white overflow-scroll max-w-60 max-h-10">
                     {participant.name}
                   </h2>
 
