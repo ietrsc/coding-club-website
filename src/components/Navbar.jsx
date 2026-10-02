@@ -190,7 +190,7 @@ function Navbar() {
             </Link>
 
             {/* Home */}
-
+{/*
             <Link
               to="/sih"
               className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/sih"
@@ -199,11 +199,11 @@ function Navbar() {
                 }`}
             >
               SIH
-            </Link>
+            </Link> */}
 
             {/* Members */}
 
-            {/* <Link
+            <Link
               to="/members"
               className={`px-4 py-2 text-sm rounded-full ${location.pathname === "/members"
                 ? "bg-surface text-foreground"
@@ -211,7 +211,7 @@ function Navbar() {
                 }`}
             >
               Members
-            </Link> */}
+            </Link>
           </div>
         </div>
 

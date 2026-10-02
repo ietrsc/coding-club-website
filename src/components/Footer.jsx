@@ -35,7 +35,7 @@ function Footer() {
 
         {/* Copyright */}
         <div className="text-center text-xs sm:text-sm ">
-          © {new Date().getFullYear()} IET Students Community. All rights reserved. |  Not an official entity or associate of the department of CSE.
+          © {new Date().getFullYear()} IET Students Community. All rights reserved.
         </div>
 
     </footer>

@@ -105,8 +105,8 @@ function EventDetails() {
 
               </button>
               <a
-                className={`${event.status === 'expired' ? '' : 'hidden'} `}
-                onClick={() => navigate(`/results/${event.slug}`)}
+                className={`${event.status === 'expired' ? '' : 'hidden'}`}
+                onClick={event.slug === "sih-2026" ? () => navigate('/sih') : () => navigate(`/results/${event.slug}`)}
               >
                 View Results →
               </a>
@@ -137,10 +137,10 @@ function EventDetails() {
         </button>
         <a
           className={`${event.status === 'expired' ? '' : 'hidden'} z-10`}
-          onClick={() => navigate(`/results/${event.slug}`)}
+          onClick={event.slug === "sih-2026" ? () => navigate('/sih') : () => navigate(`/results/${event.slug}`)}
         >
           <div className=' flex justify-center items-center rounded-full border border-primary bg-primary sm:bg-surface hover:bg-linear-to-r from-primary to-highlight text-center text-white transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 active:scale-95  w-35 h-10 text-sm mt-0 sm:mt-3 cursor-pointer'>
-            View Results →
+            {event.slug === "sih-2026" ? "View Teams" : "View Results →"}
 
           </div>
         </a>
